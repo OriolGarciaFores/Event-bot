@@ -29,7 +29,7 @@ const embed = {
 			name: FIELD_NAME_PARTICIPANTES,
 			value: '0',
 		},
-		{ name: FIELD_NAME_TANK, value: '\u200b', inline: true },
+		{ name: FIELD_NAME_TANK, value: 'Test\nTest2', inline: true },
 		{ name: FIELD_NAME_DPS, value: '\u200b', inline: true },
 		{ name: FIELD_NAME_HEAL, value: '\u200b', inline: true }
 	],
@@ -103,6 +103,7 @@ client.on('messageCreate', async message => {
 			}
 		}
 	} catch (e) {
+		console.log(e);
 		embedError.description= 'Error al crear un comando!';
 		message.channel.send({embeds: [embedError]});
 	}
@@ -138,6 +139,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		}
 
 	} catch (e) {
+		console.log(e);
 		embedError.description = 'Algo ha ido mal! Error messageReactionAdd';
 		reaction.message.channel.send({embeds: [embedError]});
 	}
@@ -167,6 +169,7 @@ client.on('messageReactionRemove', (reaction, user) => {
 			reaction.message.edit({ embeds: [embed] });
 		}
 	} catch (e) {
+		console.log(e);
 		embedError.description ='Algo ha ido mal! Error messageReactionRemove';
 		reaction.message.channel.send({embeds: [embedError]});
 	}
@@ -264,15 +267,17 @@ function getPositionField(fields, id) {
 function retirarUserField(fields, user, nameField) {
 	let position = getPositionField(fields, nameField);
 	let myArray = fields[position].value.split("\n");
+	let participantes = '';
 
 	myArray = myArray.filter(e => e !== user.username);
 
 	if (myArray.length == 0) {
 		fields[position].value = '\u200b';
 	} else {
-		for (let value in myArray) {
-			fields[position].value = fields[position].value + '\n' + value;
+		for (let i = 0; i < myArray.length; i++) {
+			participantes = participantes + myArray[i] + '\n';
 		}
+		fields[position].value = participantes;
 	}
 
 	return fields;
