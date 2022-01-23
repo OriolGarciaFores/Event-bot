@@ -1,5 +1,4 @@
 const { Client, Intents, MessageEmbed, Message } = require('discord.js');
-const { prefix } = require('./config.json');
 
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
@@ -60,13 +59,13 @@ client.on('messageCreate', async message => {
 		
 
 		if (message.author.bot) return;
-		if(commandName !== prefix + 'raid' ) return;
+		if(commandName !== '!raid' ) return;
 
 		if (!commandDesc || !commandTime) {
 			embedError.description = 'Comando incorrecto !raid -d descripcion -t horario';
 			message.channel.send({embeds: [embedError]});
 		} else {
-			if (commandName === prefix + 'raid') {
+			if (commandName === '!raid') {
 				//message.reply({ embeds: [embed] });
 				//message.reply("REPLY");//RESPUESTA
 				//message.channel.send("SEND CHANNEL");//MENSAJE AL CANAL
