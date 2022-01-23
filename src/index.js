@@ -255,4 +255,5 @@ function retirarUserField(fields, user, nameField) {
 	return fields;
 }
 
-client.login(process.env.TOKEN);
+//client.login(process.env.TOKEN);  
+client.login("OTMzNzMwMjM2NDgxMjkwMjcw.YelyDA.kPSsgZOiPdq56cSUCD1LcUkhR4w");
