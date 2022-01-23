@@ -1,6 +1,6 @@
 const { Client, Intents, MessageEmbed, Message } = require('discord.js');
 const { prefix } = require('./config.json');
-require("dotenv").config();
+
 
 const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
 const HEAL = '🚑';
