@@ -29,7 +29,7 @@ const embed = {
 			name: FIELD_NAME_PARTICIPANTES,
 			value: '0',
 		},
-		{ name: FIELD_NAME_TANK, value: 'Test\nTest2', inline: true },
+		{ name: FIELD_NAME_TANK, value: '\u200b', inline: true },
 		{ name: FIELD_NAME_DPS, value: '\u200b', inline: true },
 		{ name: FIELD_NAME_HEAL, value: '\u200b', inline: true }
 	],
