@@ -49,7 +49,7 @@ const embedHelp = {
 	'Desglose: \n' +
 	'!evento: Para crear el evento que distribuye en 3 roles (tank, dps y heal). \n' +
 	'-d: Añade la descripción del evento. \n' + 
-	'-t: Horario descriptivo de cuando se establece el evento. \n' +
+	'-t: Horario descriptivo de cuando se establece el evento. \n\n' +
 	'Ej: !evento -d Vamos ha intentar montar la primera raid/trial/mazmorra/evento, indicar vuestros roles en las distintas reacciones. -t Domingo 23 de Enero a las 17:00, horario España.',
 	timestamp: new Date()
 };
