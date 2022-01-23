@@ -96,9 +96,10 @@ client.on('messageCreate', async message => {
 				embed.fields[0].value = horario;
 				const msg = await message.channel.send({content: "@everyone", embeds: [embed], fetchReply: true });
 
-				msg.react(HEAL);
+				
 				msg.react(TANK);
 				msg.react(DPS);
+				msg.react(HEAL);
 
 			}
 		}
@@ -275,7 +276,7 @@ function retirarUserField(fields, user, nameField) {
 		fields[position].value = '\u200b';
 	} else {
 		for (let i = 0; i < myArray.length; i++) {
-			participantes = participantes + myArray[i] + '\n';
+			participantes = participantes + '\n' + myArray[i];
 		}
 		fields[position].value = participantes;
 	}
