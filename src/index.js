@@ -94,7 +94,7 @@ client.on('messageCreate', async message => {
 
 				embed.description = descripcion;
 				embed.fields[0].value = horario;
-				const msg = await message.channel.send({ embeds: [embed], fetchReply: true });
+				const msg = await message.channel.send({content: "@everyone", embeds: [embed], fetchReply: true });
 
 				msg.react(HEAL);
 				msg.react(TANK);
