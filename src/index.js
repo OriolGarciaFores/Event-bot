@@ -15,7 +15,7 @@ const FIELD_NAME_PARTICIPANTES = 'PARTICIPANTES';
 
 const embed = {
 	color: 0x0099ff,
-	title: 'RAID',
+	title: 'EVENTO',
 	author: {
 		name: 'Event-bot'
 	},
@@ -33,6 +33,24 @@ const embed = {
 		{ name: FIELD_NAME_DPS, value: '\u200b', inline: true },
 		{ name: FIELD_NAME_HEAL, value: '\u200b', inline: true }
 	],
+	timestamp: new Date()
+};
+
+const embedHelp = {
+	color: 0x0099ff,
+	title: 'HELP',
+	author: {
+		name: 'Event-bot'
+	},
+	description:
+	'Comandos principales: \n' +
+	'!help: Información de los comandos. \n' +
+	'!evento -d <Descripción> -t <horario> \n\n' +
+	'Desglose: \n' +
+	'!evento: Para crear el evento que distribuye en 3 roles (tank, dps y heal). \n' +
+	'-d: Añade la descripción del evento. \n' + 
+	'-t: Horario descriptivo de cuando se establece el evento. \n' +
+	'Ej: !evento -d Vamos ha intentar montar la primera raid/trial/mazmorra/evento, indicar vuestros roles en las distintas reacciones. -t Domingo 23 de Enero a las 17:00, horario España.',
 	timestamp: new Date()
 };
 
@@ -60,13 +78,14 @@ client.on('messageCreate', async message => {
 		
 
 		if (message.author.bot) return;
-		if(commandName !== prefix + 'raid' ) return;
+		if(commandName === prefix + 'help') return enviarMensajeHelp(message);
+		if(commandName !== prefix + 'evento' ) return;
 
 		if (!commandDesc || !commandTime) {
-			embedError.description = 'Comando incorrecto !raid -d descripcion -t horario';
+			embedError.description = 'Comando incorrecto !evento -d descripcion -t horario';
 			message.channel.send({embeds: [embedError]});
 		} else {
-			if (commandName === prefix + 'raid') {
+			if (commandName === prefix + 'evento') {
 				//message.reply({ embeds: [embed] });
 				//message.reply("REPLY");//RESPUESTA
 				//message.channel.send("SEND CHANNEL");//MENSAJE AL CANAL
@@ -152,6 +171,10 @@ client.on('messageReactionRemove', (reaction, user) => {
 		reaction.message.channel.send({embeds: [embedError]});
 	}
 });
+
+function enviarMensajeHelp(message){
+	return message.channel.send({embeds: [embedHelp]});;
+}
 
 
 function calcularParticipantes(fields) {
