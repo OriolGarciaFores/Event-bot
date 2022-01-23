@@ -29,9 +29,9 @@ const embed = {
 			name: FIELD_NAME_PARTICIPANTES,
 			value: '0',
 		},
-		{ name: FIELD_NAME_TANK, value: '\u200b', inline: true },
-		{ name: FIELD_NAME_DPS, value: '\u200b', inline: true },
-		{ name: FIELD_NAME_HEAL, value: '\u200b', inline: true }
+		{ name: FIELD_NAME_TANK, value: '\u200B', inline: true },
+		{ name: FIELD_NAME_DPS, value: '\u200B', inline: true },
+		{ name: FIELD_NAME_HEAL, value: '\u200B', inline: true }
 	],
 	timestamp: new Date()
 };
@@ -276,6 +276,8 @@ function retirarUserField(fields, user, nameField) {
 		fields[position].value = '\u200b';
 	} else {
 		for (let i = 0; i < myArray.length; i++) {
+			if(participantes === '') participantes = myArray[i];
+			else
 			participantes = participantes + '\n' + myArray[i];
 		}
 		fields[position].value = participantes;
