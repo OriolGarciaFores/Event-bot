@@ -6,12 +6,14 @@ const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_
 const HEAL = '🚑';
 const TANK = '🛡️';
 const DPS = '⚔️';
+const DELETE_REACT = '❌';
 const COMANDO_DESCRIPCION = '-d';
 const COMANDO_TIEMPO = '-t';
 const FIELD_NAME_TANK = 'TANK';
 const FIELD_NAME_DPS = 'DPS';
 const FIELD_NAME_HEAL = 'HEAL';
 const FIELD_NAME_PARTICIPANTES = 'PARTICIPANTES';
+const FOOTER_TEXT = 'Creado por ';
 
 const embed = {
 	color: 0x0099ff,
@@ -33,7 +35,10 @@ const embed = {
 		{ name: FIELD_NAME_DPS, value: '\u200B', inline: true },
 		{ name: FIELD_NAME_HEAL, value: '\u200B', inline: true }
 	],
-	timestamp: new Date()
+	timestamp: new Date(),
+	footer: {
+		text: 'Creado por XXX'
+	}
 };
 
 const embedHelp = {
@@ -92,15 +97,16 @@ client.on('messageCreate', async message => {
 				let descripcion = getPartText(COMANDO_DESCRIPCION, mensaje);
 				let horario = getPartText(COMANDO_TIEMPO, mensaje);
 
+				
 				embed.description = descripcion;
 				embed.fields[0].value = horario;
+				embed.footer.text = FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
 				const msg = await message.channel.send({content: "@everyone", embeds: [embed], fetchReply: true });
-
 				
 				msg.react(TANK);
 				msg.react(DPS);
 				msg.react(HEAL);
-
+				msg.react(DELETE_REACT);
 			}
 		}
 	} catch (e) {
@@ -112,8 +118,13 @@ client.on('messageCreate', async message => {
 
 client.on('messageReactionAdd', async (reaction, user) => {
 	try {
-		if (!user.bot) {
-			var embed = reaction.message.embeds[0];
+		if(user.bot) return;
+		var embed = reaction.message.embeds[0];
+		var userId = user.username + '#' + user.discriminator;
+		var creadorEmber = embed.footer.text.split(FOOTER_TEXT)[1];
+
+		if(reaction.emoji.name === DELETE_REACT && userId === creadorEmber) reaction.message.delete();
+		if (reaction.emoji.name !== DELETE_REACT) {
 			var fields = embed.fields;
 			let position = 0;
 
