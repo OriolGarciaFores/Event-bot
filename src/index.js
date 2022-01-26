@@ -2,7 +2,11 @@ const { Client, Intents, MessageEmbed, Message } = require('discord.js');
 const { prefix } = require('../config.json');
 require("dotenv").config();
 
-const client = new Client({ intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS] });
+const client = new Client({
+	 intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+	 partials: ['REACTION', 'MESSAGE'] 
+	});
+
 const HEAL = '🚑';
 const TANK = '🛡️';
 const DPS = '⚔️';
@@ -60,7 +64,7 @@ const embedHelp = {
 };
 
 const embedError = {
-	color: 0x0099ff,
+	color: 0xff0000,
 	title: 'La liaste!',
 	author: {
 		name: 'Event-bot'
@@ -80,7 +84,6 @@ client.on('messageCreate', async message => {
 		let commandName = getCommand(mensaje);
 		let commandDesc = mensaje.includes(COMANDO_DESCRIPCION);
 		let commandTime = mensaje.includes(COMANDO_TIEMPO);
-		
 
 		if (message.author.bot) return;
 		if(commandName === prefix + 'help') return enviarMensajeHelp(message);
@@ -88,7 +91,7 @@ client.on('messageCreate', async message => {
 
 		if (!commandDesc || !commandTime) {
 			embedError.description = 'Comando incorrecto !evento -d descripcion -t horario';
-			message.channel.send({embeds: [embedError]});
+			await message.channel.send({embeds: [embedError]});
 		} else {
 			if (commandName === prefix + 'evento') {
 				//message.reply({ embeds: [embed] });
@@ -112,78 +115,150 @@ client.on('messageCreate', async message => {
 	} catch (e) {
 		console.log(e);
 		embedError.description= 'Error al crear un comando!';
-		message.channel.send({embeds: [embedError]});
+		await message.channel.send({embeds: [embedError]});
 	}
 });
 
 client.on('messageReactionAdd', async (reaction, user) => {
 	try {
 		if(user.bot) return;
-		var embed = reaction.message.embeds[0];
-		var userId = user.username + '#' + user.discriminator;
-		var creadorEmber = embed.footer.text.split(FOOTER_TEXT)[1];
+		if(reaction.message.partial){
+			reaction.message.fetch().then(fullMessage => {
+				if (fullMessage.author.bot && fullMessage.embeds !== undefined) {
+					var embed = fullMessage.embeds[0];
+					var userId = user.username + '#' + user.discriminator;
+					var creadorEmber = embed.footer.text.split(FOOTER_TEXT)[1];
+	
+					if (reaction.emoji.name === DELETE_REACT && userId === creadorEmber) reaction.message.delete();
+					if (reaction.emoji.name !== DELETE_REACT) {
+						var fields = embed.fields;
+						let position = 0;
+	
+						switch (reaction.emoji.name) {
+							case DPS:
+								position = getPositionField(fields, FIELD_NAME_DPS);
+								fields[position] = editarField(fields[position], user);
+								break;
+							case HEAL:
+								position = getPositionField(fields, FIELD_NAME_HEAL);
+								fields[position] = editarField(fields[position], user);
+								break;
+							case TANK:
+								position = getPositionField(fields, FIELD_NAME_TANK);
+								fields[position] = editarField(fields[position], user);
+								break;
+						}
+	
+						fields = calcularParticipantes(fields);
+						embed.setFields(fields);
+						reaction.message.edit({ embeds: [embed] });
+					}
+				}else{
+					return;
+				}
+			}).catch(e => {
+				console.log(e);
+				embedError.description = 'Algo ha ido mal! Error messageReactionAdd';
+				reaction.message.channel.send({embeds: [embedError]});
+			});
+		}else{
+			if(!reaction.message.author.bot) return;
+			var embed = reaction.message.embeds[0];
+			var userId = user.username + '#' + user.discriminator;
+			var creadorEmber = embed.footer.text.split(FOOTER_TEXT)[1];
 
-		if(reaction.emoji.name === DELETE_REACT && userId === creadorEmber) reaction.message.delete();
-		if (reaction.emoji.name !== DELETE_REACT) {
-			var fields = embed.fields;
-			let position = 0;
+			if (reaction.emoji.name === DELETE_REACT && userId === creadorEmber) reaction.message.delete();
+			if (reaction.emoji.name !== DELETE_REACT) {
+				var fields = embed.fields;
+				let position = 0;
 
-			switch (reaction.emoji.name) {
-				case DPS:
-					position = getPositionField(fields, FIELD_NAME_DPS);
-					fields[position] = editarField(fields[position], user);
-					break;
-				case HEAL:
-					position = getPositionField(fields, FIELD_NAME_HEAL);
-					fields[position] = editarField(fields[position], user);
-					break;
-				case TANK:
-					position = getPositionField(fields, FIELD_NAME_TANK);
-					fields[position] = editarField(fields[position], user);
-					break;
+				switch (reaction.emoji.name) {
+					case DPS:
+						position = getPositionField(fields, FIELD_NAME_DPS);
+						fields[position] = editarField(fields[position], user);
+						break;
+					case HEAL:
+						position = getPositionField(fields, FIELD_NAME_HEAL);
+						fields[position] = editarField(fields[position], user);
+						break;
+					case TANK:
+						position = getPositionField(fields, FIELD_NAME_TANK);
+						fields[position] = editarField(fields[position], user);
+						break;
+				}
+
+				fields = calcularParticipantes(fields);
+				embed.setFields(fields);
+				await reaction.message.edit({ embeds: [embed] });
 			}
-
-			fields = calcularParticipantes(fields);
-
-			embed.setFields(fields);
-
-			reaction.message.edit({ embeds: [embed] });
 		}
-
+		
 	} catch (e) {
 		console.log(e);
 		embedError.description = 'Algo ha ido mal! Error messageReactionAdd';
-		reaction.message.channel.send({embeds: [embedError]});
+		await reaction.message.channel.send({embeds: [embedError]});
 	}
 
 });
 
-client.on('messageReactionRemove', (reaction, user) => {
+client.on('messageReactionRemove', async (reaction, user) => {
 	try {
 		if (!user.bot) {
-			var embed = reaction.message.embeds[0];
-			var fields = embed.fields;
+			if (reaction.message.partial) {
+				reaction.message.fetch().then(fullMessage => {
+					if (fullMessage.author.bot && fullMessage.embeds !== undefined) {
+						var embed = fullMessage.embeds[0];
+						var fields = embed.fields;
 
-			switch (reaction.emoji.name) {
-				case DPS:
-					fields = retirarUserField(fields, user, FIELD_NAME_DPS);
-					break;
-				case HEAL:
-					fields = retirarUserField(fields, user, FIELD_NAME_HEAL);
-					break;
-				case TANK:
-					fields = retirarUserField(fields, user, FIELD_NAME_TANK);
-					break;
+						switch (reaction.emoji.name) {
+							case DPS:
+								fields = retirarUserField(fields, user, FIELD_NAME_DPS);
+								break;
+							case HEAL:
+								fields = retirarUserField(fields, user, FIELD_NAME_HEAL);
+								break;
+							case TANK:
+								fields = retirarUserField(fields, user, FIELD_NAME_TANK);
+								break;
+						}
+
+						fields = calcularParticipantes(fields);
+						embed.setFields(fields);
+						reaction.message.edit({ embeds: [embed] });
+					} else {
+						return;
+					}
+				}).catch(e => {
+					console.log(e);
+					embedError.description = 'Algo ha ido mal! Error messageReactionRemove';
+					reaction.message.channel.send({ embeds: [embedError] });
+				});
+			}else{
+				if(!reaction.message.author.bot) return;
+				var embed = reaction.message.embeds[0];
+				var fields = embed.fields;
+
+				switch (reaction.emoji.name) {
+					case DPS:
+						fields = retirarUserField(fields, user, FIELD_NAME_DPS);
+						break;
+					case HEAL:
+						fields = retirarUserField(fields, user, FIELD_NAME_HEAL);
+						break;
+					case TANK:
+						fields = retirarUserField(fields, user, FIELD_NAME_TANK);
+						break;
+				}
+
+				fields = calcularParticipantes(fields);
+				embed.setFields(fields);
+				await reaction.message.edit({ embeds: [embed] });
 			}
-
-			fields = calcularParticipantes(fields);
-			embed.setFields(fields);
-			reaction.message.edit({ embeds: [embed] });
 		}
 	} catch (e) {
 		console.log(e);
 		embedError.description ='Algo ha ido mal! Error messageReactionRemove';
-		reaction.message.channel.send({embeds: [embedError]});
+		await reaction.message.channel.send({embeds: [embedError]});
 	}
 });
 
