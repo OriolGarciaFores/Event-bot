@@ -158,8 +158,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
 				}
 			}).catch(e => {
 				console.log(e);
-				embedError.description = 'Algo ha ido mal! Error messageReactionAdd';
-				reaction.message.channel.send({embeds: [embedError]});
+				//embedError.description = 'Algo ha ido mal! Error messageReactionAdd';
+				//reaction.message.channel.send({embeds: [embedError]});
 			});
 		}else{
 			if(!reaction.message.author.bot) return;
@@ -195,8 +195,8 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		
 	} catch (e) {
 		console.log(e);
-		embedError.description = 'Algo ha ido mal! Error messageReactionAdd';
-		await reaction.message.channel.send({embeds: [embedError]});
+		//embedError.description = 'Algo ha ido mal! Error messageReactionAdd';
+		//await reaction.message.channel.send({embeds: [embedError]});
 	}
 
 });
@@ -230,8 +230,8 @@ client.on('messageReactionRemove', async (reaction, user) => {
 					}
 				}).catch(e => {
 					console.log(e);
-					embedError.description = 'Algo ha ido mal! Error messageReactionRemove';
-					reaction.message.channel.send({ embeds: [embedError] });
+					//embedError.description = 'Algo ha ido mal! Error messageReactionRemove';
+					//reaction.message.channel.send({ embeds: [embedError] });
 				});
 			}else{
 				if(!reaction.message.author.bot) return;
@@ -257,8 +257,8 @@ client.on('messageReactionRemove', async (reaction, user) => {
 		}
 	} catch (e) {
 		console.log(e);
-		embedError.description ='Algo ha ido mal! Error messageReactionRemove';
-		await reaction.message.channel.send({embeds: [embedError]});
+		//embedError.description ='Algo ha ido mal! Error messageReactionRemove';
+		//await reaction.message.channel.send({embeds: [embedError]});
 	}
 });
 
