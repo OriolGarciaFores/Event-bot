@@ -76,6 +76,7 @@ const embedError = {
 
 client.once("ready", () => {
 	console.log("INICIADO");
+	client.user.setActivity('!help', { type: 'WATCHING' });
 });
 
 client.on('messageCreate', async message => {
