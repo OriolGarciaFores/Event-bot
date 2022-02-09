@@ -1,23 +1,22 @@
-const { Client, Intents, MessageEmbed, Message } = require('discord.js');
+const { Client, Intents, MessageEmbed, Message, Collection } = require('discord.js');
 const { prefix } = require('../config.json');
+//const fs = require('fs');
+const LITERAL = require('./constants/literals.js');
+const CONSTANTS = require('./constants/constants.js');
 require("dotenv").config();
-
 const client = new Client({
 	 intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
 	 partials: ['REACTION', 'MESSAGE'] 
 	});
 
-const HEAL = '🚑';
-const TANK = '🛡️';
-const DPS = '⚔️';
-const DELETE_REACT = '❌';
-const COMANDO_DESCRIPCION = '-d';
-const COMANDO_TIEMPO = '-t';
-const FIELD_NAME_TANK = 'TANK';
-const FIELD_NAME_DPS = 'DPS';
-const FIELD_NAME_HEAL = 'HEAL';
-const FIELD_NAME_PARTICIPANTES = 'PARTICIPANTES';
-const FOOTER_TEXT = 'Creado por ';
+//client.commands = new Collection();
+
+/*const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	client.commands.set(command.name, command);
+}*/
 
 const embed = {
 	color: 0x0099ff,
@@ -32,12 +31,12 @@ const embed = {
 			value: 'Ej: Dom. 17:00 EU',
 		},
 		{
-			name: FIELD_NAME_PARTICIPANTES,
+			name: LITERAL.FIELD_NAME_PARTICIPANTES,
 			value: '0',
 		},
-		{ name: FIELD_NAME_TANK, value: '\u200B', inline: true },
-		{ name: FIELD_NAME_DPS, value: '\u200B', inline: true },
-		{ name: FIELD_NAME_HEAL, value: '\u200B', inline: true }
+		{ name: LITERAL.FIELD_NAME_TANK, value: '\u200B', inline: true },
+		{ name: LITERAL.FIELD_NAME_DPS, value: '\u200B', inline: true },
+		{ name: LITERAL.FIELD_NAME_HEAL, value: '\u200B', inline: true }
 	],
 	timestamp: new Date(),
 	footer: {
@@ -80,13 +79,30 @@ client.once("ready", () => {
 });
 
 client.on('messageCreate', async message => {
-	try {
-		let mensaje = message.content;
-		let commandName = getCommand(mensaje);
-		let commandDesc = mensaje.includes(COMANDO_DESCRIPCION);
-		let commandTime = mensaje.includes(COMANDO_TIEMPO);
 
-		if (message.author.bot) return;
+	if (!message.content.startsWith(prefix)) return;
+	if (message.author.bot) return;
+
+	let mensaje = message.content;
+	let commandName = getCommand(mensaje);
+	
+	/*const command = client.commands.get(commandName);
+
+	console.log(command);
+
+	if(!command) return;
+	console.log('HOLA');
+	await command.execute(message);
+*/
+
+
+	try {
+		
+		let commandDesc = mensaje.includes(CONSTANTS.COMANDO_DESCRIPCION);
+		let commandTime = mensaje.includes(CONSTANTS.COMANDO_TIEMPO);
+
+		
+		
 		if(commandName === prefix + 'help') return enviarMensajeHelp(message);
 		if(commandName !== prefix + 'evento' ) return;
 
@@ -98,19 +114,19 @@ client.on('messageCreate', async message => {
 				//message.reply({ embeds: [embed] });
 				//message.reply("REPLY");//RESPUESTA
 				//message.channel.send("SEND CHANNEL");//MENSAJE AL CANAL
-				let descripcion = getPartText(COMANDO_DESCRIPCION, mensaje);
-				let horario = getPartText(COMANDO_TIEMPO, mensaje);
+				let descripcion = getPartText(CONSTANTS.COMANDO_DESCRIPCION, mensaje);
+				let horario = getPartText(CONSTANTS.COMANDO_TIEMPO, mensaje);
 
 				
 				embed.description = descripcion;
 				embed.fields[0].value = horario;
-				embed.footer.text = FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
+				embed.footer.text = LITERAL.FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
 				const msg = await message.channel.send({content: "@everyone", embeds: [embed], fetchReply: true });
 				
-				msg.react(TANK);
-				msg.react(DPS);
-				msg.react(HEAL);
-				msg.react(DELETE_REACT);
+				msg.react(CONSTANTS.TANK);
+				msg.react(CONSTANTS.DPS);
+				msg.react(CONSTANTS.HEAL);
+				msg.react(CONSTANTS.DELETE_REACT);
 			}
 		}
 	} catch (e) {
@@ -128,24 +144,24 @@ client.on('messageReactionAdd', async (reaction, user) => {
 				if (fullMessage.author.bot && fullMessage.embeds !== undefined) {
 					var embed = fullMessage.embeds[0];
 					var userId = user.username + '#' + user.discriminator;
-					var creadorEmber = embed.footer.text.split(FOOTER_TEXT)[1];
+					var creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
 	
-					if (reaction.emoji.name === DELETE_REACT && userId === creadorEmber) reaction.message.delete();
-					if (reaction.emoji.name !== DELETE_REACT) {
+					if (reaction.emoji.name === CONSTANTS.DELETE_REACT && userId === creadorEmber) reaction.message.delete();
+					if (reaction.emoji.name !== CONSTANTS.DELETE_REACT) {
 						var fields = embed.fields;
 						let position = 0;
 	
 						switch (reaction.emoji.name) {
-							case DPS:
-								position = getPositionField(fields, FIELD_NAME_DPS);
+							case CONSTANTS.DPS:
+								position = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
 								fields[position] = editarField(fields[position], user);
 								break;
-							case HEAL:
-								position = getPositionField(fields, FIELD_NAME_HEAL);
+							case CONSTANTS.HEAL:
+								position = getPositionField(fields, LITERAL.FIELD_NAME_HEAL);
 								fields[position] = editarField(fields[position], user);
 								break;
-							case TANK:
-								position = getPositionField(fields, FIELD_NAME_TANK);
+							case CONSTANTS.TANK:
+								position = getPositionField(fields, LITERAL.FIELD_NAME_TANK);
 								fields[position] = editarField(fields[position], user);
 								break;
 						}
@@ -166,24 +182,24 @@ client.on('messageReactionAdd', async (reaction, user) => {
 			if(!reaction.message.author.bot) return;
 			var embed = reaction.message.embeds[0];
 			var userId = user.username + '#' + user.discriminator;
-			var creadorEmber = embed.footer.text.split(FOOTER_TEXT)[1];
+			var creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
 
-			if (reaction.emoji.name === DELETE_REACT && userId === creadorEmber) reaction.message.delete();
-			if (reaction.emoji.name !== DELETE_REACT) {
+			if (reaction.emoji.name === CONSTANTS.DELETE_REACT && userId === creadorEmber) reaction.message.delete();
+			if (reaction.emoji.name !== CONSTANTS.DELETE_REACT) {
 				var fields = embed.fields;
 				let position = 0;
 
 				switch (reaction.emoji.name) {
-					case DPS:
-						position = getPositionField(fields, FIELD_NAME_DPS);
+					case CONSTANTS.DPS:
+						position = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
 						fields[position] = editarField(fields[position], user);
 						break;
-					case HEAL:
-						position = getPositionField(fields, FIELD_NAME_HEAL);
+					case CONSTANTS.HEAL:
+						position = getPositionField(fields, LITERAL.FIELD_NAME_HEAL);
 						fields[position] = editarField(fields[position], user);
 						break;
-					case TANK:
-						position = getPositionField(fields, FIELD_NAME_TANK);
+					case CONSTANTS.TANK:
+						position = getPositionField(fields, LITERAL.FIELD_NAME_TANK);
 						fields[position] = editarField(fields[position], user);
 						break;
 				}
@@ -212,14 +228,14 @@ client.on('messageReactionRemove', async (reaction, user) => {
 						var fields = embed.fields;
 
 						switch (reaction.emoji.name) {
-							case DPS:
-								fields = retirarUserField(fields, user, FIELD_NAME_DPS);
+							case CONSTANTS.DPS:
+								fields = retirarUserField(fields, user, LITERAL.FIELD_NAME_DPS);
 								break;
-							case HEAL:
-								fields = retirarUserField(fields, user, FIELD_NAME_HEAL);
+							case CONSTANTS.HEAL:
+								fields = retirarUserField(fields, user, LITERAL.FIELD_NAME_HEAL);
 								break;
-							case TANK:
-								fields = retirarUserField(fields, user, FIELD_NAME_TANK);
+							case CONSTANTS.TANK:
+								fields = retirarUserField(fields, user, LITERAL.FIELD_NAME_TANK);
 								break;
 						}
 
@@ -240,14 +256,14 @@ client.on('messageReactionRemove', async (reaction, user) => {
 				var fields = embed.fields;
 
 				switch (reaction.emoji.name) {
-					case DPS:
-						fields = retirarUserField(fields, user, FIELD_NAME_DPS);
+					case CONSTANTS.DPS:
+						fields = retirarUserField(fields, user, LITERAL.FIELD_NAME_DPS);
 						break;
-					case HEAL:
-						fields = retirarUserField(fields, user, FIELD_NAME_HEAL);
+					case CONSTANTS.HEAL:
+						fields = retirarUserField(fields, user, LITERAL.FIELD_NAME_HEAL);
 						break;
-					case TANK:
-						fields = retirarUserField(fields, user, FIELD_NAME_TANK);
+					case CONSTANTS.TANK:
+						fields = retirarUserField(fields, user, LITERAL.FIELD_NAME_TANK);
 						break;
 				}
 
@@ -269,10 +285,10 @@ function enviarMensajeHelp(message){
 
 
 function calcularParticipantes(fields) {
-	let posicionDps = getPositionField(fields, FIELD_NAME_DPS);
-	let posicionHeal = getPositionField(fields, FIELD_NAME_HEAL);
-	let posicionTank = getPositionField(fields, FIELD_NAME_TANK);
-	let posicionParticipantes = getPositionField(fields, FIELD_NAME_PARTICIPANTES);
+	let posicionDps = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
+	let posicionHeal = getPositionField(fields, LITERAL.FIELD_NAME_HEAL);
+	let posicionTank = getPositionField(fields, LITERAL.FIELD_NAME_TANK);
+	let posicionParticipantes = getPositionField(fields, LITERAL.FIELD_NAME_PARTICIPANTES);
 	
 	let participantes = [];
 

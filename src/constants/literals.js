@@ -1,0 +1,7 @@
+module.exports = {
+    FIELD_NAME_TANK : 'TANK',
+    FIELD_NAME_DPS : 'DPS',
+    FIELD_NAME_HEAL : 'HEAL',
+    FIELD_NAME_PARTICIPANTES : 'PARTICIPANTES',
+    FOOTER_TEXT : 'Creado por '
+}
