@@ -3,7 +3,7 @@ const { prefix } = require('../config.json');
 const fs = require('fs');
 require("dotenv").config();
 const client = new Client({
-	 intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+	 intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS],
 	 partials: ['REACTION', 'MESSAGE'] 
 	});
 
@@ -24,6 +24,11 @@ const embedError = {
 	},
 	description: 'Error generic.',
 	timestamp: new Date()
+};
+
+const embedWelcome = {
+	color: 0xfbfaff,
+	title: '¿¿QUIEN OSA ENTRAR EN NUESTROS DOMINIOS??'
 };
 
 client.once("ready", () => {
@@ -109,6 +114,14 @@ client.on('messageReactionRemove', async (reaction, user) => {
 		console.log(e);
 		//embedError.description ='Algo ha ido mal! Error messageReactionRemove';
 		//await reaction.message.channel.send({embeds: [embedError]});
+	}
+});
+
+client.on('guildMemberAdd', async member => {
+	try {
+		member.guild.channels.cache.get(member.guild.systemChannelId).send({embeds: [embedWelcome]});
+	} catch (e) {
+		console.log("Error guildMemberAdd: " + e);
 	}
 });
 
