@@ -66,13 +66,23 @@ module.exports = {
 		var embed = reaction.message.embeds[0];
 		var userId = user.username + '#' + user.discriminator;
 		var creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
-
-		if (reaction.emoji.name === CONSTANTS.DELETE_REACT && userId === creadorEmber) reaction.message.delete();
-		if (reaction.emoji.name !== CONSTANTS.DELETE_REACT) {
+		let oldReactionUser = await getOldReactionByUser(reaction, user);
+		let emoji = reaction.emoji.name;
+		
+		if(oldReactionUser !== undefined) {
+			await reaction.message.reactions.resolve(emoji).users.remove(user.id);
+			return;
+		}
+		
+		if (emoji === CONSTANTS.DELETE_REACT){
+			if(userId === creadorEmber) reaction.message.delete();
+			else reaction.message.reactions.resolve(emoji).users.remove(user.id);
+		}
+		if (emoji !== CONSTANTS.DELETE_REACT) {
 			var fields = embed.fields;
 			let position = 0;
 
-			switch (reaction.emoji.name) {
+			switch (emoji) {
 				case CONSTANTS.DPS:
 					position = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
 					fields[position] = editarField(fields[position], user);
@@ -200,4 +210,21 @@ function retirarUserField(fields, user, nameField) {
 	}
 
 	return fields;
+}
+
+async function getOldReactionByUser(reaction, user){
+	let maps = reaction.message.reactions.cache;
+	let emoji = reaction.emoji.name;
+	let oldReaction;
+
+	for(let [key, value]  of maps){
+		if(key !== CONSTANTS.DELETE_REACT && key !== emoji && emoji !== CONSTANTS.DELETE_REACT){
+			let users = await value.users.fetch();
+			let us = users.get(user.id);
+
+			if(us !== undefined) oldReaction = key
+		}
+	}
+
+	return oldReaction;
 }

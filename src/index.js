@@ -1,4 +1,4 @@
-const { Client, Intents, MessageEmbed, Message, Collection } = require('discord.js');
+const { Client, Intents, Collection } = require('discord.js');
 const { prefix } = require('../config.json');
 const fs = require('fs');
 require("dotenv").config();
@@ -60,7 +60,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 		
 		if(reaction.message.partial){
 			reaction.message.fetch().then(async fullMessage => {
-				if (fullMessage.author.bot && fullMessage.embeds !== undefined) {
+				if (fullMessage.author.bot && fullMessage.embeds !== undefined && fullMessage.author.id === client.user.id) {
 					var embed = fullMessage.embeds[0];
 					const command = client.commands.get(embed.title.toLowerCase());
 					if(!command || !command.reactions) return;
@@ -72,7 +72,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 				//reaction.message.channel.send({embeds: [embedError]});
 			});
 		}else{
-			if(!reaction.message.author.bot) return;
+			if(!reaction.message.author.bot || reaction.message.author.id !== client.user.id) return;
 			var embed = reaction.message.embeds[0];
 			const command = client.commands.get(embed.title.toLowerCase());
 			if(!command || !command.reactions) return;
@@ -92,7 +92,8 @@ client.on('messageReactionRemove', async (reaction, user) => {
 
 		if (reaction.message.partial) {
 			reaction.message.fetch().then(async fullMessage => {
-				if (fullMessage.author.bot && fullMessage.embeds !== undefined) {
+				if (fullMessage.author.bot && fullMessage.embeds !== undefined && fullMessage.author.id === client.user.id) {
+					console.log('ENTRO');
 					var embed = fullMessage.embeds[0];
 					const command = client.commands.get(embed.title.toLowerCase());
 					if(!command || !command.reactions) return;
@@ -104,7 +105,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
 				//reaction.message.channel.send({ embeds: [embedError] });
 			});
 		}else{
-			if(!reaction.message.author.bot) return;
+			if(!reaction.message.author.bot || reaction.message.author.id !== client.user.id) return;
 			var embed = reaction.message.embeds[0];
 			const command = client.commands.get(embed.title.toLowerCase());
 			if(!command || !command.reactions) return;
