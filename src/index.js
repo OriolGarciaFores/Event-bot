@@ -93,7 +93,6 @@ client.on('messageReactionRemove', async (reaction, user) => {
 		if (reaction.message.partial) {
 			reaction.message.fetch().then(async fullMessage => {
 				if (fullMessage.author.bot && fullMessage.embeds !== undefined && fullMessage.author.id === client.user.id) {
-					console.log('ENTRO');
 					var embed = fullMessage.embeds[0];
 					const command = client.commands.get(embed.title.toLowerCase());
 					if(!command || !command.reactions) return;
