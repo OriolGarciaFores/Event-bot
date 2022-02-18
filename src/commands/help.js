@@ -1,12 +1,13 @@
 const CONSTANTS = require('../constants/constants.js');
+const COLOR = require('../constants/colors.js');
 const embedHelp = {
-	color: 0x0099ff,
+	color: COLOR.BLUE,
 	title: 'HELP',
-	author: {
-		name: 'Event-bot'
-	},
 	description:
 	'Lista de comandos disponibles del bot. Cualquier duda o sugerencia contactar con **Tebrase#5760**. ',
+	thumbnail: {
+		url: 'https://cdn2.iconfinder.com/data/icons/app-types-in-grey/512/info_512pxGREY.png',
+	},
 	fields: [
 		{
 			name: '**__Comandos principales:__**', 
@@ -28,7 +29,7 @@ const embedHelp = {
 			CONSTANTS.TANK + ' **TANK** ' + '\n' +
 			CONSTANTS.DPS + ' **DPS** ' +  '\n' +
 			CONSTANTS.HEAL +' **HEAL** ' +  '\n' +
-			'Para eliminar el evento, solo lo puede hacer el creador del evento reaccionando a ' + CONSTANTS.DELETE_REACT + ' o bien un admin/mod eliminando el mensaje entero.'
+			CONSTANTS.DELETE_REACT + ' Para eliminar el evento. Solo lo puede hacer el creador del evento o bien un admin/mod eliminando el mensaje entero.'
 		}
 	],
 	timestamp: new Date()

@@ -2,5 +2,6 @@ module.exports = {
     AMBULANCE : '🚑',
     SHIELD : '🛡️',
     SWORDS_CROSS : '⚔️',
-    CROSS : '❌'
+    CROSS : '❌',
+    CALENDAR : '📅'
 }

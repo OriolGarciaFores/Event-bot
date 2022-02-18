@@ -1,25 +1,24 @@
 const LITERAL = require('../constants/literals.js');
 const CONSTANTS = require('../constants/constants.js');
+const COLOR = require('../constants/colors.js');
 
 const embed = {
-	color: 0x0099ff,
+	color: COLOR.BLUE,
 	title: 'EVENTO',
-	author: {
-		name: 'Event-bot'
-	},
 	description: 'Ej: El domingo 23 de enero volvemos a intentar hacer grupo para realizar las primeras TRIALS del mapa de Clagorn.',
 	fields: [
 		{
-			name: 'HORARIO',
+			name: LITERAL.TITLE_HORARIO,
 			value: 'Ej: Dom. 17:00 EU',
 		},
 		{
 			name: LITERAL.FIELD_NAME_PARTICIPANTES,
-			value: '0',
+			value: LITERAL.FIELD_PARTICIPANTES_TOTAL + '0',
 		},
-		{ name: LITERAL.FIELD_NAME_TANK, value: '\u200B', inline: true },
-		{ name: LITERAL.FIELD_NAME_DPS, value: '\u200B', inline: true },
-		{ name: LITERAL.FIELD_NAME_HEAL, value: '\u200B', inline: true }
+		{ name: LITERAL.FIELD_NAME_TANK + ' - 0', value: '\u200B', inline: true },
+		{ name: LITERAL.FIELD_NAME_DPS + ' - 0', value: '\u200B', inline: true },
+		{ name: LITERAL.FIELD_NAME_HEAL + ' - 0', value: '\u200B', inline: true },
+		{ name: '\u200b', value: '\u200b' }
 	],
 	timestamp: new Date(),
 	footer: {
@@ -28,11 +27,8 @@ const embed = {
 };
 
 const embedError = {
-	color: 0xff0000,
+	color: COLOR.RED,
 	title: 'La liaste!',
-	author: {
-		name: 'Event-bot'
-	},
 	description: 'Error generic.',
 	timestamp: new Date()
 };
@@ -68,7 +64,7 @@ module.exports = {
 		var creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
 		let oldReactionUser = await getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
-		
+
 		if(oldReactionUser !== undefined) {
 			await reaction.message.reactions.resolve(emoji).users.remove(user.id);
 			return;
@@ -144,7 +140,7 @@ function getPartText(command, mensaje) {
 
 function getPositionField(fields, id) {
 	for (let i = 0; i < fields.length; i++) {
-		if (fields[i].name === id) return i;
+		if (fields[i].name.includes(id)) return i;
 	}
 
 	return;
@@ -173,6 +169,10 @@ function calcularParticipantes(fields) {
 	let heal = fields[posicionHeal].value.split('\n');
 	let tank = fields[posicionTank].value.split('\n');
 
+	dps = dps.filter(item => item !== '\u200b');
+	heal = heal.filter(item => item !== '\u200b');
+	tank = tank.filter(item => item !== '\u200b');
+
 	for(let i = 0; i <  dps.length; i++){
 		if(!participantes.includes(dps[i])) participantes.push(dps[i]);
 	}
@@ -187,7 +187,10 @@ function calcularParticipantes(fields) {
 
 	participantes = participantes.filter(item => item !== '\u200b');
 	
-	fields[posicionParticipantes].value = participantes.length + '';
+	fields[posicionParticipantes].value = LITERAL.FIELD_PARTICIPANTES_TOTAL + participantes.length + '';
+	fields[posicionDps].name = LITERAL.FIELD_NAME_DPS + ' - ' + dps.length;
+	fields[posicionTank].name = LITERAL.FIELD_NAME_TANK + ' - ' + tank.length;
+	fields[posicionHeal].name = LITERAL.FIELD_NAME_HEAL + ' - ' + heal.length;
 	return fields;
 }
 
