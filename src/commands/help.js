@@ -1,5 +1,6 @@
 const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
+const EMOJIS = require('../constants/emojis.js');
 const embedHelp = {
 	color: COLOR.BLUE,
 	title: 'HELP',
@@ -38,8 +39,15 @@ const embedHelp = {
 
 module.exports = {
 	name: 'help',
-	reactions: false,
+	reactions: true,
 	async execute(message) {
 		return message.channel.send({embeds: [embedHelp]});;
 	},
+	async reactionAdd(reaction, user){
+		await reaction.message.reactions.resolve(EMOJIS.RELOAD).users.remove(user.id);
+		await reaction.message.edit({ embeds: [embedHelp] });
+	},
+	async reactionRemove(reaction, user){
+		return;
+	}
 };

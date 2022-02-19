@@ -3,5 +3,6 @@ module.exports = {
     SHIELD : '🛡️',
     SWORDS_CROSS : '⚔️',
     CROSS : '❌',
-    CALENDAR : '📅'
+    CALENDAR : '📅',
+    RELOAD : '🔄'
 }
