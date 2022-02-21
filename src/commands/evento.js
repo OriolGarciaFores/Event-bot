@@ -36,7 +36,7 @@ const embedError = {
 module.exports = {
 	name: 'evento',
 	reactions: true,
-	async execute(message, content) {
+	async execute(message, content, client) {
 		let commandDesc = content.includes(CONSTANTS.COMANDO_DESCRIPCION);
 		let commandTime = content.includes(CONSTANTS.COMANDO_TIEMPO);
 

@@ -46,7 +46,7 @@ client.on('messageCreate', async message => {
 		let commandName = getCommand(content);
 		const command = client.commands.get(commandName);
 		if(!command) return;
-		await command.execute(message, content);
+		await command.execute(message, content, client);
 	} catch (e) {
 		console.log(e);
 		embedError.description= 'Error al crear un comando!';

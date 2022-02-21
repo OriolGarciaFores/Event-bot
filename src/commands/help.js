@@ -12,7 +12,9 @@ const embedHelp = {
 	fields: [
 		{
 			name: '**__Comandos principales:__**', 
-			value: '**!help:** Información de los comandos. \n' + '**!evento -d <Descripción> -t <horario>**'
+			value: '**!help:** Información de los comandos. \n' +
+			'**!report <descripción>:** Para enviar un mensaje privado informando de tu duda o problema con el bot. Destinatario, **Tebrase#5760** \n' +
+			'**!evento -d <Descripción> -t <horario>**'
 		},
 		{
 			name: '**__Desglose:__** ', 
@@ -40,7 +42,7 @@ const embedHelp = {
 module.exports = {
 	name: 'help',
 	reactions: true,
-	async execute(message) {
+	async execute(message,  content, client) {
 		return message.channel.send({embeds: [embedHelp]});;
 	},
 	async reactionAdd(reaction, user){
