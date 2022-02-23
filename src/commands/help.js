@@ -14,17 +14,20 @@ const embedHelp = {
 			name: '**__Comandos principales:__**', 
 			value: '**!help:** Información de los comandos. \n' +
 			'**!report <descripción>:** Para enviar un mensaje privado informando de tu duda o problema con el bot. Destinatario, **Tebrase#5760** \n' +
-			'**!evento -d <Descripción> -t <horario>**'
+			'**!vote <pregunta> -r <respuesta_1> -r <respuesta_2> :** Genera un questionario mediante votos entre 2-5 respuestas. \n' +
+			'**!evento -d <Descripción> -t <horario>:** Para crear el evento que distribuye en 3 roles (tank, dps y heal).'
 		},
 		{
 			name: '**__Desglose:__** ', 
-			value: '**!evento:** Para crear el evento que distribuye en 3 roles (tank, dps y heal). \n' +
+			value: '**!evento:** Identificador del comando. \n' +
 			'**-d:** Añade la descripción del evento. \n' + 
 			'**-t:** Horario descriptivo de cuando se establece el evento.'
 		},
 		{
-			name: '**__Ejemplo:__** ', 
-			value: '**!evento -d** Vamos ha intentar montar la primera raid/trial/mazmorra/evento, indicar vuestros roles en las distintas reacciones. **-t** Domingo 23 de Enero a las 17:00, horario España.'
+			name: '**__Ejemplos:__** ', 
+			value: '**!evento -d** Vamos ha intentar montar la primera raid/trial/mazmorra/evento, indicar vuestros roles en las distintas reacciones. **-t** Domingo 23 de Enero a las 17:00, horario España. \n' +
+			'**!report** Tengo un error al reaccionar o al ejecutar un comando del bot. \n' +
+			'**!vote** ¿Comida favorita? **-r** Pasta **-r** Carne **-r** Arroz **-r** Pollo **-r** Pescado'
 		},
 		{
 			name: '**__Evento:__** ', 

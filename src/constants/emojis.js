@@ -4,5 +4,10 @@ module.exports = {
     SWORDS_CROSS : '⚔️',
     CROSS : '❌',
     CALENDAR : '📅',
-    RELOAD : '🔄'
+    RELOAD : '🔄',
+    A: '🇦',
+    B: '🇧',
+    C: '🇨', 
+    D: '🇩',
+    E: '🇪'
 }

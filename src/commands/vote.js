@@ -1,0 +1,172 @@
+const utils = require('../modules/Utils.js');
+const COLOR = require('../constants/colors.js');
+const EMOJI = require('../constants/emojis.js');
+const CONSTANTS = require('../constants/constants.js');
+const LITERAL = require('../constants/literals.js');
+
+const embed = {
+	color: COLOR.GREEN,
+	title: 'VOTE',
+	description: '**¿Pregunta?**',
+	fields: [],
+	timestamp: new Date(),
+	footer: {
+		text: 'Creado por XXX'
+	}
+};
+
+const RESPUESTAS_REACTIONS = [EMOJI.A, EMOJI.B, EMOJI.C, EMOJI.D, EMOJI.E];
+const MAX_SIZE_BAR = 20;
+
+module.exports = {
+	name: 'vote',
+	reactions: true,
+	async execute(message, content, client) {
+		let question = content.substring(content.indexOf('vote') + 'vote'.length + 1, content.indexOf('-r'));
+		let respuestas = content.split(' -r ');
+		respuestas.shift();
+
+		if (!validarRequisitos(question, respuestas)) {
+			let error = 'No cumple con los requisitos. !vote <pregunta> -r <respuesta> (Entre 2-5).';
+
+			await message.channel.send({embeds: [utils.generarMensajeError(error)]});
+		} else {
+			let bar = utils.progressBar(0, 1, MAX_SIZE_BAR);
+			embed.fields = [];
+
+			embed.description = utils.textNegrita(question);
+
+			for (let i = 0; i < respuestas.length; i++) {
+				let field = {
+					name: RESPUESTAS_REACTIONS[i] + ' ' + respuestas[i],
+					value: bar + ' V: 0'
+				}
+
+				embed.fields[i] = field;
+			}
+			embed.footer.text = LITERAL.FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
+
+			const msg = await message.channel.send({ embeds: [embed], fetchReply: true });
+
+			for (let i = 0; i < respuestas.length; i++) {
+				msg.react(RESPUESTAS_REACTIONS[i]);
+			}
+			msg.react(CONSTANTS.DELETE_REACT);
+		}
+	},
+	async reactionAdd(reaction, user) {
+		const OPERATION = '+';
+		var embed = reaction.message.embeds[0];
+		var userId = user.username + '#' + user.discriminator;
+		var creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
+		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
+		let emoji = reaction.emoji.name;
+		let totalVotos = 0;
+
+		if (oldReactionUser !== undefined) {
+			await reaction.message.reactions.resolve(emoji).users.remove(user.id);
+			return;
+		}
+
+		if (emoji === CONSTANTS.DELETE_REACT) {
+			if (userId === creadorEmber) reaction.message.delete();
+			else await reaction.message.reactions.resolve(emoji).users.remove(user.id);
+		} else {
+			let fields = embed.fields;
+			let position = 0;
+
+			position = buscarPosicionRespuesta(emoji, position);
+			totalVotos = calcularTotalVotos(fields, totalVotos);
+
+			totalVotos++;
+
+			updateFields(fields, position, totalVotos, OPERATION)
+
+			embed.setFields(fields);
+
+			await reaction.message.edit({ embeds: [embed] });
+		}
+	},
+	async reactionRemove(reaction, user) {
+		const OPERATION = '-';
+		var embed = reaction.message.embeds[0];
+		let emoji = reaction.emoji.name;
+		let totalVotos = 0;
+		let fields = embed.fields;
+		let position = 0;
+
+		if (emoji === CONSTANTS.DELETE_REACT) return;
+
+		position = buscarPosicionRespuesta(emoji);
+		totalVotos = calcularTotalVotos(fields);
+
+		totalVotos--;
+
+		updateFields(fields, position, totalVotos, OPERATION)
+
+		embed.setFields(fields);
+
+		await reaction.message.edit({ embeds: [embed] });
+	}
+};
+
+function validarRequisitos(question, respuestas){
+	if(respuestas.length > 5 || respuestas.length < 2) return false;
+	else {
+		for(let i = 0; i < respuestas.length; i++){
+			if(respuestas[i].trim() === '') {
+				return false;
+			}
+		}
+	}
+	if(question === undefined || question.length === 0 || question.trim() === '') return false;
+
+	return true;
+}
+
+function buscarPosicionRespuesta(emoji) {
+	for (let i = 0; i < RESPUESTAS_REACTIONS.length; i++) {
+		if (emoji === RESPUESTAS_REACTIONS[i]) {
+			return i;
+		}
+	}
+}
+
+function calcularTotalVotos(fields) {
+	let totalVotos = 0;
+
+	for (let i = 0; i < fields.length; i++) {
+		totalVotos += parseInt(fields[i].value.split('V: ')[1]);
+	}
+
+	return totalVotos;
+}
+
+
+function updateFields(fields, position, totalVotos, operation) {
+	for (let i = 0; i < fields.length; i++) {
+		let bar;
+		let votos = fields[i].value.split('V: ')[1];
+
+		votos = parseInt(votos);
+
+		if (operation === '-') {
+			if (i === position && votos > 0) {
+				votos--;
+				bar = utils.progressBar(votos, totalVotos, MAX_SIZE_BAR);
+			} else {
+				bar = utils.progressBar(votos, totalVotos, MAX_SIZE_BAR);
+			}
+		} else {
+			if (i === position) {
+				votos++;
+				bar = utils.progressBar(votos, totalVotos, MAX_SIZE_BAR);
+			} else {
+				bar = utils.progressBar(votos, totalVotos, MAX_SIZE_BAR);
+			}
+		}
+
+		fields[i].value = bar + ' V: ' + votos;
+	}
+
+}
