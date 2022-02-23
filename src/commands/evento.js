@@ -1,6 +1,7 @@
 const LITERAL = require('../constants/literals.js');
 const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
+const utils = require('../modules/Utils.js');
 
 const embed = {
 	color: COLOR.BLUE,
@@ -26,13 +27,6 @@ const embed = {
 	}
 };
 
-const embedError = {
-	color: COLOR.RED,
-	title: 'La liaste!',
-	description: 'Error generic.',
-	timestamp: new Date()
-};
-
 module.exports = {
 	name: 'evento',
 	reactions: true,
@@ -41,8 +35,9 @@ module.exports = {
 		let commandTime = content.includes(CONSTANTS.COMANDO_TIEMPO);
 
 		if (!commandDesc || !commandTime) {
-			embedError.description = 'Comando incorrecto !evento -d descripcion -t horario';
-			await message.channel.send({embeds: [embedError]});
+			let error = 'Comando incorrecto !evento -d descripcion -t horario';
+
+			await message.channel.send({embeds: [utils.generarMensajeError(error)]});
 		} else {
 			let descripcion = getPartText(CONSTANTS.COMANDO_DESCRIPCION, content);
 			let horario = getPartText(CONSTANTS.COMANDO_TIEMPO, content);
@@ -62,7 +57,7 @@ module.exports = {
 		var embed = reaction.message.embeds[0];
 		var userId = user.username + '#' + user.discriminator;
 		var creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
-		let oldReactionUser = await getOldReactionByUser(reaction, user);
+		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
 
 		if(oldReactionUser !== undefined) {
@@ -213,21 +208,4 @@ function retirarUserField(fields, user, nameField) {
 	}
 
 	return fields;
-}
-
-async function getOldReactionByUser(reaction, user){
-	let maps = reaction.message.reactions.cache;
-	let emoji = reaction.emoji.name;
-	let oldReaction;
-
-	for(let [key, value]  of maps){
-		if(key !== CONSTANTS.DELETE_REACT && key !== emoji && emoji !== CONSTANTS.DELETE_REACT){
-			let users = await value.users.fetch();
-			let us = users.get(user.id);
-
-			if(us !== undefined) oldReaction = key
-		}
-	}
-
-	return oldReaction;
 }
