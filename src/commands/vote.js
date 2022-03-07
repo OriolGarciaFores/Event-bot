@@ -57,11 +57,14 @@ module.exports = {
 	async reactionAdd(reaction, user) {
 		const OPERATION = '+';
 		var embed = reaction.message.embeds[0];
+		let fields = embed.fields;
 		var userId = user.username + '#' + user.discriminator;
 		var creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
 		let totalVotos = 0;
+
+		if(!validarRespuestas(fields.length, emoji) && emoji !== CONSTANTS.DELETE_REACT) return;
 
 		if (oldReactionUser !== undefined) {
 			await reaction.message.reactions.resolve(emoji).users.remove(user.id);
@@ -72,7 +75,6 @@ module.exports = {
 			if (userId === creadorEmber) reaction.message.delete();
 			else await reaction.message.reactions.resolve(emoji).users.remove(user.id);
 		} else {
-			let fields = embed.fields;
 			let position = 0;
 
 			position = buscarPosicionRespuesta(emoji, position);
@@ -95,7 +97,7 @@ module.exports = {
 		let fields = embed.fields;
 		let position = 0;
 
-		if (emoji === CONSTANTS.DELETE_REACT) return;
+		if (emoji === CONSTANTS.DELETE_REACT || !validarRespuestas(fields.length, emoji)) return;
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		
 		if(oldReactionUser !== undefined) return;
@@ -125,6 +127,14 @@ function validarRequisitos(question, respuestas){
 	if(question === undefined || question.length === 0 || question.trim() === '') return false;
 
 	return true;
+}
+
+function validarRespuestas(cantidadRespuestas, emoji){
+	for(let i = 0; i < cantidadRespuestas; i++){
+		if(emoji === RESPUESTAS_REACTIONS[i]) return true;
+	}
+
+	return false;
 }
 
 function buscarPosicionRespuesta(emoji) {
