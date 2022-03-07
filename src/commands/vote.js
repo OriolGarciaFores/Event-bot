@@ -96,6 +96,9 @@ module.exports = {
 		let position = 0;
 
 		if (emoji === CONSTANTS.DELETE_REACT) return;
+		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
+		
+		if(oldReactionUser !== undefined) return;
 
 		position = buscarPosicionRespuesta(emoji);
 		totalVotos = calcularTotalVotos(fields);
