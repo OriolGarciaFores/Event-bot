@@ -30,7 +30,7 @@ const embed = {
 module.exports = {
 	slash : {
         name : 'evento',
-		description : 'Comando para generar un evento.',
+		description : 'Para crear el evento que distribuye en 3 roles (tank, dps y heal).',
 		type : CONSTANTS.SLASH_TYPE_INPUT,
         options : [
             {

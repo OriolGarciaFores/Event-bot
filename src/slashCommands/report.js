@@ -23,7 +23,7 @@ const embedReport = {
 module.exports = {
 	slash : {
         name : 'report',
-		description : 'Votación de 2-5 respuestas posibles.',
+		description : 'Para enviar un mensaje privado informando de tu duda o problema con el bot.',
 		type : constant.SLASH_TYPE_INPUT,
         options : [
             {
