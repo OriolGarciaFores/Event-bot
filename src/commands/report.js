@@ -1,4 +1,5 @@
 const COLOR = require('../constants/colors.js');
+const constants = require('../constants/constants.js');
 
 const embedError = {
 	color: COLOR.RED,
@@ -37,7 +38,7 @@ module.exports = {
             user.send({embeds: [embedReport]});
         }
 
-        await message.channel.send({embeds: [embedInfo]});;
+        await message.channel.send({content: constants.TEXT_WARNING_DEPRECATE_COMMAND,embeds: [embedInfo]});;
 	}
 };
 

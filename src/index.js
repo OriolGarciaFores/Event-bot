@@ -50,7 +50,7 @@ const TYPE_REACTION_REMOVE = 'messageReactionRemove';
 
 client.once("ready", () => {
 	log.info("INICIADO");
-	client.user.setActivity('!help', { type: 'WATCHING' });
+	client.user.setActivity('!help - V.1.2.0', { type: 'WATCHING' });
 });
 
 client.on('interactionCreate', async interaction => {
@@ -138,7 +138,7 @@ async function reactions(type, message, reaction, user) {
 		let command;
 
 		if (message.interaction !== null && message.interaction.type === 'APPLICATION_COMMAND')
-			command = client.slashCommands.get(embed.title.toLowerCase());
+			command = client.slashCommands.get(embed.title.toLowerCase().split(' ')[0]);
 		else command = client.commands.get(embed.title.toLowerCase());
 
 		if (!command || !command.reactions) return;

@@ -2,6 +2,7 @@ const LITERAL = require('../constants/literals.js');
 const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
 const utils = require('../modules/Utils.js');
+const constants = require('../constants/constants.js');
 
 const embed = {
 	color: COLOR.BLUE,
@@ -45,7 +46,7 @@ module.exports = {
 			embed.description = descripcion;
 			embed.fields[0].value = horario;
 			embed.footer.text = LITERAL.FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
-			const msg = await message.channel.send({ content: "@everyone", embeds: [embed], fetchReply: true });
+			const msg = await message.channel.send({ content: "@everyone " + constants.TEXT_WARNING_DEPRECATE_COMMAND, embeds: [embed], fetchReply: true });
 
 			msg.react(CONSTANTS.TANK);
 			msg.react(CONSTANTS.DPS);

@@ -3,9 +3,11 @@ const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
 const utils = require('../modules/Utils.js');
 
+const TITLE_EMBED = 'EVENTO';
+
 const embed = {
 	color: COLOR.BLUE,
-	title: 'EVENTO',
+	title: TITLE_EMBED,
 	description: 'Ej: El domingo 23 de enero volvemos a intentar hacer grupo para realizar las primeras TRIALS del mapa de Clagorn.',
 	fields: [
 		{
@@ -33,6 +35,12 @@ module.exports = {
 		description : 'Para crear el evento que distribuye en 3 roles (tank, dps y heal).',
 		type : CONSTANTS.SLASH_TYPE_INPUT,
         options : [
+			{
+                name : "titulo",
+                description : "Título del evento.",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
+				required: true
+            },
             {
                 name : "description",
                 description : "Descripción del evento",
@@ -44,18 +52,28 @@ module.exports = {
                 description : "Horario del evento",
                 type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
                 required : true
-            }
+            },
+			{
+				name : "url_img",
+				description : "URL para añadir una imagen al evento.",
+				type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
+				required : false
+			}
         ]
     },
 	reactions: true,
 	async execute(interaction, options, client) {
+		let titulo = options.getString('titulo');
         let descripcion = options.getString('description');
         let horario = options.getString('horario');
+		let urlImage = options.getString('url_img');
 
 		if(interaction.guildId === null) return;
 
+		embed.title = TITLE_EMBED + ' - ' + titulo;
         embed.description = descripcion;
         embed.fields[0].value = horario;
+		if(utils.isImage(urlImage)) embed.image = { url: urlImage};
         embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;
 
         const msg = await interaction.reply({ content: "@everyone", embeds: [embed], fetchReply: true });

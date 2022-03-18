@@ -31,6 +31,6 @@ const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
 //applicationCommands -> GLOBAL Tarda 1 hora al añadirse a los servers.
 //applicationGuildCommands -> Solo para un server especifico, se añade inmediato
-rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands })
+rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID_DEV), { body: commands })
 	.then(() => log.correct('Successfully registered application commands.'))
 	.catch(console.error);

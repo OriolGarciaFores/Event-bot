@@ -46,7 +46,7 @@ module.exports = {
 			}
 			embed.footer.text = LITERAL.FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
 
-			const msg = await message.channel.send({ embeds: [embed], fetchReply: true });
+			const msg = await message.channel.send({content: CONSTANTS.TEXT_WARNING_DEPRECATE_COMMAND, embeds: [embed], fetchReply: true });
 
 			for (let i = 0; i < respuestas.length; i++) {
 				msg.react(RESPUESTAS_REACTIONS[i]);

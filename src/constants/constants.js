@@ -12,5 +12,6 @@ module.exports = {
     SLASH_OPTION_TYPE_INTEGER : 4,
     SLASH_OPTION_TYPE_BOOLEAN : 5,
     SLASH_OPTION_TYPE_USER : 6,
-    SLASH_OPTION_TYPE_CHANNEL : 7
+    SLASH_OPTION_TYPE_CHANNEL : 7,
+    TEXT_WARNING_DEPRECATE_COMMAND : 'Comandos con `!` estan en desuso y se van a eliminar. Intenta usar los nuevos `/`.\n Más información `/help`.'
 }
