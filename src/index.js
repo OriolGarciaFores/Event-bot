@@ -50,7 +50,7 @@ const TYPE_REACTION_REMOVE = 'messageReactionRemove';
 
 client.once("ready", () => {
 	log.info("INICIADO");
-	client.user.setActivity('!help - V.1.2.0', { type: 'WATCHING' });
+	client.user.setActivity('!help | Version: 1.2.0', { type: 'PLAYING' });
 });
 
 client.on('interactionCreate', async interaction => {
