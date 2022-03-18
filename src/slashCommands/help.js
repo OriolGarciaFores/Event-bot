@@ -13,13 +13,13 @@ const embedHelp = {
 		{
 			name: '**__Comandos principales:__**', 
 			value: '**/help:** Información de los comandos. \n' +
-			'**/report <descripción>:** Para enviar un mensaje privado informando de tu duda o problema con el bot. Destinatario, **Tebrase#5760** \n' +
-			'**/vote <pregunta> <respuesta_1> <respuesta_2> :** Genera un questionario mediante votos entre 2-5 respuestas. \n' +
-			'**/evento <Descripción> <horario>:** Para crear el evento que distribuye en 3 roles (tank, dps y heal).'
+			'**/report:** Para enviar un mensaje privado informando de tu duda o problema con el bot. Destinatario, **Tebrase#5760** \n' +
+			'**/vote:** Genera un questionario mediante votos entre 2-5 respuestas. \n' +
+			'**/evento:** Para crear el evento que distribuye en 3 roles (tank, dps y heal).'
 		},
 		{
 			name: '**__Ejemplos:__** ', 
-			value: '**/evento description:** Vamos ha intentar montar la primera raid/trial/mazmorra/evento, indicar vuestros roles en las distintas reacciones. **horario:** Domingo 23 de Enero a las 17:00, horario España. \n' +
+			value: '**/evento titulo:** RAID TRAINING **description:** Vamos ha intentar montar la primera raid/trial/mazmorra/evento, indicar vuestros roles en las distintas reacciones. **horario:** Domingo 23 de Enero a las 17:00, horario España. \n' +
 			'**/report description:** Tengo un error al reaccionar o al ejecutar un comando del bot. \n' +
 			'**/vote pregunta:** ¿Comida favorita? **respuesta_1:** Pasta **respuesta_2:** Carne **respuesta_3:** Arroz **respuesta_4:** Pollo **respuesta_5:** Pescado'
 		},
