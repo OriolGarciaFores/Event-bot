@@ -66,6 +66,8 @@ module.exports = {
         let bar = utils.progressBar(0, 1, MAX_SIZE_BAR);
         let respuestas = [];
 
+		if(interaction.guildId === null) return;
+
         for (let i = 1; i < 6; i++) {
             let optionName = "respuesta_" + i;
             let value = options.getString(optionName);

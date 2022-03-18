@@ -52,6 +52,8 @@ module.exports = {
         let descripcion = options.getString('description');
         let horario = options.getString('horario');
 
+		if(interaction.guildId === null) return;
+
         embed.description = descripcion;
         embed.fields[0].value = horario;
         embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;

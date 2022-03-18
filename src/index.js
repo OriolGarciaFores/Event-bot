@@ -61,8 +61,11 @@ client.on('interactionCreate', async interaction => {
 
 	if(!command) return;
 
-	await command.execute(interaction, options, client);
-
+	try {
+		await command.execute(interaction, options, client);
+	} catch (e) {
+		log.error(e);
+	}
 });
 
 client.on('messageCreate', async message => {
