@@ -68,6 +68,8 @@ module.exports = {
         let horario = options.getString('horario');
 		let urlImage = options.getString('url_img');
 
+		descripcion = descripcion.replaceAll('\\n', '\n');
+
 		if(interaction.guildId === null) return;
 
 		embed.title = TITLE_EMBED + ' - ' + titulo;
