@@ -78,7 +78,7 @@ module.exports = {
 		if(utils.isImage(urlImage)) embed.image = { url: urlImage};
         embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;
 
-        const msg = await interaction.reply({ content: "@everyone", embeds: [embed], fetchReply: true });
+        const msg = await interaction.reply({embeds: [embed], fetchReply: true });
 
         msg.react(CONSTANTS.TANK);
         msg.react(CONSTANTS.DPS);
