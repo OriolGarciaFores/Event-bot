@@ -15,7 +15,8 @@ const embedHelp = {
 			value: '**/help:** Información de los comandos. \n' +
 			'**/report:** Para enviar un mensaje privado informando de tu duda o problema con el bot. Destinatario, **Tebrase#5760** \n' +
 			'**/vote:** Genera un questionario mediante votos entre 2-5 respuestas. \n' +
-			'**/evento:** Para crear el evento que distribuye en 3 roles (tank, dps y heal).'
+			'**/evento:** Para crear el evento que distribuye en 3 roles (tank, dps y heal). \n' +
+			'**/ping:** Realiza un test de velocidad.'
 		},
 		{
 			name: '**__Ejemplos:__** ', 
