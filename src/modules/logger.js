@@ -1,19 +1,23 @@
 const COLOR = require('../constants/consoleColors.js');
 
 function info(content){
-    console.log(COLOR.BLUE, content);
+    if(process.env.LOG_INFO) console.log(COLOR.BLUE, '[INFO]' + content);
 }
 
 function error(content){
-    console.log(COLOR.RED, content);
+    if(process.env.LOG_ERROR) console.log(COLOR.RED, '[ERROR]' + content);
 }
 
 function warn(content){
-    console.log(COLOR.YELLOW, content);
+    if(process.env.LOG_WARN) console.log(COLOR.YELLOW, '[WARN]' + content);
 }
 
 function correct(content){
-    console.log(COLOR.GREEN, content);
+    if(process.env.LOG_SUCCESS) console.log(COLOR.GREEN, '[SUCCESS]' + content);
 }
 
-module.exports = {info, error, warn, correct}
+function debug(content){
+    if(process.env.LOG_DEBUG) console.log('[DEBUG]' + content);
+}
+
+module.exports = {info, error, warn, correct, debug}
