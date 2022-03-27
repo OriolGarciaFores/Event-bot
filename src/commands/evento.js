@@ -46,7 +46,7 @@ module.exports = {
 			embed.description = descripcion;
 			embed.fields[0].value = horario;
 			embed.footer.text = LITERAL.FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
-			const msg = await message.channel.send({ content: "@everyone " + constants.TEXT_WARNING_DEPRECATE_COMMAND, embeds: [embed], fetchReply: true });
+			const msg = await message.channel.send({ content: constants.TEXT_WARNING_DEPRECATE_COMMAND, embeds: [embed], fetchReply: true });
 
 			msg.react(CONSTANTS.TANK);
 			msg.react(CONSTANTS.DPS);
