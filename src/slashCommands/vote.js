@@ -19,40 +19,83 @@ const RESPUESTAS_REACTIONS = [EMOJI.A, EMOJI.B, EMOJI.C, EMOJI.D, EMOJI.E];
 const MAX_SIZE_BAR = 20;
 
 module.exports = {
-	name: 'vote',
+	slash : {
+        name : 'vote',
+		description : 'Votación de 2-5 respuestas posibles.',
+		type : CONSTANTS.SLASH_TYPE_INPUT,
+        options : [
+            {
+                name : "pregunta",
+                description : "¿Pregunta?",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
+                required : true
+            },
+            {
+                name : "respuesta_1",
+                description : "Respuesta 1",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
+                required : true
+            },
+            {
+                name : "respuesta_2",
+                description : "Respuesta 2",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
+                required : true
+            },
+            {
+                name : "respuesta_3",
+                description : "Respuesta 3 (Opcional)",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING
+            },
+            {
+                name : "respuesta_4",
+                description : "Respuesta 4 (Optcional)",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING
+            },
+            {
+                name : "respuesta_5",
+                description : "Respuesta 5 (Opcional)",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING
+            }
+
+        ]
+    },
 	reactions: true,
-	async execute(message, content, client) {
-		let question = content.substring(content.indexOf('vote') + 'vote'.length + 1, content.indexOf('-r'));
-		let respuestas = content.split(' -r ');
-		respuestas.shift();
+	async execute(interaction, options, client) {
+        let question = options.getString("pregunta");
+        let bar = utils.progressBar(0, 1, MAX_SIZE_BAR);
+        let respuestas = [];
 
-		if (!validarRequisitos(question, respuestas)) {
-			let error = 'No cumple con los requisitos. !vote <pregunta> -r <respuesta> (Entre 2-5).';
+		if(interaction.guildId === null) return;
 
-			await message.channel.send({embeds: [utils.generarMensajeError(error)]});
-		} else {
-			let bar = utils.progressBar(0, 1, MAX_SIZE_BAR);
-			embed.fields = [];
+        for (let i = 1; i < 6; i++) {
+            let optionName = "respuesta_" + i;
+            let value = options.getString(optionName);
 
-			embed.description = utils.textNegrita(question);
+            if (value !== null) respuestas.push(value);
+        }
 
-			for (let i = 0; i < respuestas.length; i++) {
-				let field = {
-					name: RESPUESTAS_REACTIONS[i] + ' ' + respuestas[i],
-					value: bar + ' V: 0'
-				}
+        embed.fields = [];
+        embed.description = utils.textNegrita(question);
 
-				embed.fields[i] = field;
-			}
-			embed.footer.text = LITERAL.FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
+        for (let i = 0; i < respuestas.length; i++) {
+            let field = {
+                name: RESPUESTAS_REACTIONS[i] + ' ' + respuestas[i],
+                value: bar + ' V: 0'
+            }
 
-			const msg = await message.channel.send({content: CONSTANTS.TEXT_WARNING_DEPRECATE_COMMAND, embeds: [embed], fetchReply: true });
+            embed.fields[i] = field;
+        }
 
-			for (let i = 0; i < respuestas.length; i++) {
-				msg.react(RESPUESTAS_REACTIONS[i]);
-			}
-			msg.react(CONSTANTS.DELETE_REACT);
-		}
+        embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;
+
+        const msg = await interaction.reply({ embeds: [embed], fetchReply: true });
+
+        for (let i = 0; i < respuestas.length; i++) {
+            msg.react(RESPUESTAS_REACTIONS[i]);
+        }
+
+        msg.react(CONSTANTS.DELETE_REACT);
 	},
 	async reactionAdd(reaction, user) {
 		const OPERATION = '+';
@@ -114,20 +157,6 @@ module.exports = {
 		await reaction.message.edit({ embeds: [embed] });
 	}
 };
-
-function validarRequisitos(question, respuestas){
-	if(respuestas.length > 5 || respuestas.length < 2) return false;
-	else {
-		for(let i = 0; i < respuestas.length; i++){
-			if(respuestas[i].trim() === '') {
-				return false;
-			}
-		}
-	}
-	if(question === undefined || question.length === 0 || question.trim() === '') return false;
-
-	return true;
-}
 
 function validarRespuestas(cantidadRespuestas, emoji){
 	for(let i = 0; i < cantidadRespuestas; i++){

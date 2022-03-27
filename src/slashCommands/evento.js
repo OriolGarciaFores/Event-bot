@@ -2,11 +2,12 @@ const LITERAL = require('../constants/literals.js');
 const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
 const utils = require('../modules/Utils.js');
-const constants = require('../constants/constants.js');
+
+const TITLE_EMBED = 'EVENTO';
 
 const embed = {
 	color: COLOR.BLUE,
-	title: 'EVENTO',
+	title: TITLE_EMBED,
 	description: 'Ej: El domingo 23 de enero volvemos a intentar hacer grupo para realizar las primeras TRIALS del mapa de Clagorn.',
 	fields: [
 		{
@@ -29,35 +30,65 @@ const embed = {
 };
 
 module.exports = {
-	name: 'evento',
+	slash : {
+        name : 'evento',
+		description : 'Para crear el evento que distribuye en 3 roles (tank, dps y heal).',
+		type : CONSTANTS.SLASH_TYPE_INPUT,
+        options : [
+			{
+                name : "titulo",
+                description : "Título del evento.",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
+				required: true
+            },
+            {
+                name : "description",
+                description : "Descripción del evento",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
+                required : true
+            },
+            {
+                name : "horario",
+                description : "Horario del evento",
+                type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
+                required : true
+            },
+			{
+				name : "url_img",
+				description : "URL para añadir una imagen al evento.",
+				type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
+				required : false
+			}
+        ]
+    },
 	reactions: true,
-	async execute(message, content, client) {
-		let commandDesc = content.includes(CONSTANTS.COMANDO_DESCRIPCION);
-		let commandTime = content.includes(CONSTANTS.COMANDO_TIEMPO);
+	async execute(interaction, options, client) {
+		let titulo = options.getString('titulo');
+        let descripcion = options.getString('description');
+        let horario = options.getString('horario');
+		let urlImage = options.getString('url_img');
 
-		if (!commandDesc || !commandTime) {
-			let error = 'Comando incorrecto !evento -d descripcion -t horario';
+		descripcion = descripcion.replaceAll('\\n', '\n');
 
-			await message.channel.send({embeds: [utils.generarMensajeError(error)]});
-		} else {
-			let descripcion = getPartText(CONSTANTS.COMANDO_DESCRIPCION, content);
-			let horario = getPartText(CONSTANTS.COMANDO_TIEMPO, content);
+		if(interaction.guildId === null) return;
 
-			embed.description = descripcion;
-			embed.fields[0].value = horario;
-			embed.footer.text = LITERAL.FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
-			const msg = await message.channel.send({ content: constants.TEXT_WARNING_DEPRECATE_COMMAND, embeds: [embed], fetchReply: true });
+		embed.title = TITLE_EMBED + ' - ' + titulo;
+        embed.description = descripcion;
+        embed.fields[0].value = horario;
+		if(utils.isImage(urlImage)) embed.image = { url: urlImage};
+        embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;
 
-			msg.react(CONSTANTS.TANK);
-			msg.react(CONSTANTS.DPS);
-			msg.react(CONSTANTS.HEAL);
-			msg.react(CONSTANTS.DELETE_REACT);
-		}
+        const msg = await interaction.reply({embeds: [embed], fetchReply: true });
+
+        msg.react(CONSTANTS.TANK);
+        msg.react(CONSTANTS.DPS);
+        msg.react(CONSTANTS.HEAL);
+        msg.react(CONSTANTS.DELETE_REACT);
 	},
 	async reactionAdd(reaction, user){
-		var embed = reaction.message.embeds[0];
-		var userId = user.username + '#' + user.discriminator;
-		var creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
+		let embed = reaction.message.embeds[0];
+		let userId = user.username + '#' + user.discriminator;
+		let creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
 
@@ -71,7 +102,7 @@ module.exports = {
 			else reaction.message.reactions.resolve(emoji).users.remove(user.id);
 		}
 		if (emoji !== CONSTANTS.DELETE_REACT) {
-			var fields = embed.fields;
+			let fields = embed.fields;
 			let position = 0;
 
 			switch (emoji) {
@@ -115,24 +146,6 @@ module.exports = {
 		await reaction.message.edit({ embeds: [embed] });
 	}
 };
-
-
-function getPartText(command, mensaje) {
-	switch (command) {
-		case '-d':
-			if (mensaje.includes('-t')) {
-				return mensaje.substring(mensaje.indexOf(command) + 2, mensaje.indexOf('-t'));
-			} else {
-				return mensaje = mensaje.substring(0, mensaje.indexOf(command) + 2);
-			}
-			break;
-
-		case '-t':
-			return mensaje = mensaje.substring(mensaje.indexOf(command) + 2);
-			break;
-	}
-
-}
 
 function getPositionField(fields, id) {
 	for (let i = 0; i < fields.length; i++) {

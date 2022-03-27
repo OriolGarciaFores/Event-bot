@@ -48,9 +48,13 @@ function progressBar (value, maxValue, size) {
     return embedError;
   }
 
+  function isImage(url){
+    return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
+  }
 
 
 
 
 
-module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError}
+
+module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError, isImage}

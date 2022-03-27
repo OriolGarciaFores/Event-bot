@@ -50,7 +50,7 @@ module.exports = {
 	},
 	async reactionAdd(reaction, user){
 		await reaction.message.reactions.resolve(EMOJIS.RELOAD).users.remove(user.id);
-		await reaction.message.edit({ embeds: [embedHelp] });
+		await reaction.message.edit({content: CONSTANTS.TEXT_WARNING_DEPRECATE_COMMAND,embeds: [embedHelp] });
 	},
 	async reactionRemove(reaction, user){
 		return;
