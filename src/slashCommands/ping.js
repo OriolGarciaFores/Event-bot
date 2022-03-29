@@ -19,8 +19,8 @@ module.exports = {
     },
 	reactions: false,
 	async execute(interaction,  options, client) {
+        embed.timestamp = new Date();
         const msg = await interaction.reply({embeds : [embed], fetchReply: true});
-       // console.log(msg);
         const pingBot = msg.createdTimestamp - interaction.createdTimestamp;
 
         let fieldBotPing = {

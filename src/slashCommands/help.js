@@ -45,9 +45,11 @@ module.exports = {
     },
 	reactions: true,
 	async execute(interaction,  options, client) {
-		await interaction.reply({embeds: [embedHelp]});;
+		embedHelp.timestamp = new Date();
+		await interaction.reply({embeds: [embedHelp]});
 	},
 	async reactionAdd(reaction, user){
+		embedHelp.timestamp = new Date();
 		await reaction.message.reactions.resolve(emoji.RELOAD).users.remove(user.id);
 		await reaction.message.edit({ embeds: [embedHelp] });
 	},

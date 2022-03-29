@@ -88,6 +88,7 @@ module.exports = {
         }
 
         embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;
+		embed.timestamp = new Date();
 
         const msg = await interaction.reply({ embeds: [embed], fetchReply: true });
 
