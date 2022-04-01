@@ -9,5 +9,6 @@ module.exports = {
     B: '🇧',
     C: '🇨', 
     D: '🇩',
-    E: '🇪'
+    E: '🇪',
+    NOTEPAD: '📝'
 }
