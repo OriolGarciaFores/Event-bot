@@ -17,7 +17,8 @@ const embedHelp = {
 			'**/vote:** Genera un questionario mediante votos entre 2-5 respuestas. \n' +
 			'**/evento:** Para crear el evento que distribuye en 3 roles (tank, dps y heal). \n' +
 			'**/ping:** Realiza un test de velocidad.\n'+
-			'**/edit:** Permite modificar algunos cuadros de texto del bot que tengan habilitado el emoji ' + emoji.NOTEPAD + '.'
+			'**/edit:** Permite modificar algunos cuadros de texto del bot que tengan habilitado el emoji ' + emoji.NOTEPAD + '. \n' +
+			'**/notice:** Permite mandar un mensaje pudiendo aplicar algunos estilos.'
 		},
 		{
 			name: '**__Ejemplos:__** ', 
