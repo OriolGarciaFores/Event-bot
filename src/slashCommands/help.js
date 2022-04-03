@@ -18,7 +18,9 @@ const embedHelp = {
 			'**/evento:** Para crear el evento que distribuye en 3 roles (tank, dps y heal). \n' +
 			'**/ping:** Realiza un test de velocidad.\n'+
 			'**/edit:** Permite modificar algunos cuadros de texto del bot que tengan habilitado el emoji ' + emoji.NOTEPAD + '. \n' +
-			'**/notice:** Permite mandar un mensaje pudiendo aplicar algunos estilos.'
+			'**/notice:** Permite mandar un mensaje pudiendo aplicar algunos estilos. \n' +
+			'**/adduser evento:** Permite añadir un usuario a un evento activo sin necesidad de las reacciones. Es para usuario que compartan cuenta de discord. \n' +
+			'**/removeuser evento:** Permite retirar un usuario de un evento que esté apuntado sin necesidad de las reacciones. Es para usuario que compartan cuenta de discord.'
 		},
 		{
 			name: '**__Ejemplos:__** ', 

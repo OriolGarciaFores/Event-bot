@@ -90,7 +90,8 @@ module.exports = {
 	},
 	async reactionAdd(reaction, user){
 		let embed = reaction.message.embeds[0];
-		let userId = user.username + '#' + user.discriminator;
+		let username = user.username;
+		let userId = username + '#' + user.discriminator;
 		let creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
@@ -113,15 +114,15 @@ module.exports = {
 				switch (emoji) {
 					case CONSTANTS.DPS:
 						position = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
-						fields[position] = editarField(fields[position], user);
+						fields[position] = editarField(fields[position], username);
 						break;
 					case CONSTANTS.HEAL:
 						position = getPositionField(fields, LITERAL.FIELD_NAME_HEAL);
-						fields[position] = editarField(fields[position], user);
+						fields[position] = editarField(fields[position], username);
 						break;
 					case CONSTANTS.TANK:
 						position = getPositionField(fields, LITERAL.FIELD_NAME_TANK);
-						fields[position] = editarField(fields[position], user);
+						fields[position] = editarField(fields[position], username);
 						break;
 				}
 	
@@ -164,13 +165,13 @@ module.exports = {
 
 		switch (reaction.emoji.name) {
 			case CONSTANTS.DPS:
-				fields = retirarUserField(fields, user, LITERAL.FIELD_NAME_DPS);
+				fields = retirarUserField(fields, user.username, LITERAL.FIELD_NAME_DPS);
 				break;
 			case CONSTANTS.HEAL:
-				fields = retirarUserField(fields, user, LITERAL.FIELD_NAME_HEAL);
+				fields = retirarUserField(fields, user.username, LITERAL.FIELD_NAME_HEAL);
 				break;
 			case CONSTANTS.TANK:
-				fields = retirarUserField(fields, user, LITERAL.FIELD_NAME_TANK);
+				fields = retirarUserField(fields, user.username, LITERAL.FIELD_NAME_TANK);
 				break;
 		}
 
@@ -197,6 +198,76 @@ module.exports = {
         }
 
         await message.edit({embeds: [embed]});
+	},
+	async addUserCustom(message, interaction, nombreUsuario, rol){
+		let embed = message.embeds[0];
+		let fields = embed.fields;
+		let position = 0;
+		let existe = false;
+		const typeFields = [LITERAL.FIELD_NAME_TANK, LITERAL.FIELD_NAME_DPS, LITERAL.FIELD_NAME_HEAL];
+		const embedInfo = {
+            color: COLOR.GREEN
+        }
+
+		for(let f = 0; f < typeFields.length; f++){
+			for (let i = 0; i < fields.length; i++) {
+				if (fields[i].name.includes(typeFields[f])) {
+					let listUsers = fields[i].value.split('\n');
+
+					if(listUsers.includes(nombreUsuario)){
+						existe = true;
+						break;
+					}
+				}
+			}
+		}
+
+		if(!existe){
+			embedInfo.description = 'Usuario ' + nombreUsuario + ' añadido como rol ' + rol;
+
+			switch (rol) {
+				case CONSTANTS.DPS:
+					position = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
+					fields[position] = editarField(fields[position], nombreUsuario);
+					break;
+				case CONSTANTS.HEAL:
+					position = getPositionField(fields, LITERAL.FIELD_NAME_HEAL);
+					fields[position] = editarField(fields[position], nombreUsuario);
+					break;
+				case CONSTANTS.TANK:
+					position = getPositionField(fields, LITERAL.FIELD_NAME_TANK);
+					fields[position] = editarField(fields[position], nombreUsuario);
+					break;
+			}
+	
+			fields = calcularParticipantes(fields);
+			embed.setFields(fields);
+			
+			await message.edit({ embeds: [embed] });
+			await interaction.reply({embeds: [embedInfo], ephemeral: true});
+		}else{
+			embedInfo.color = COLOR.RED;
+			embedInfo.description = 'Usuario ' + nombreUsuario + ' ya está apuntado!';
+			await interaction.reply({embeds: [embedInfo], ephemeral: true});
+		}
+	},
+	async removeUserCustom(message, interaction, nombreUsuario){
+		let embed = message.embeds[0];
+		let fields = embed.fields;
+		const embedInfo = {
+            color: COLOR.GREEN,
+			description: 'Usuario ' + nombreUsuario + ' retirado.'
+        }
+
+		fields = retirarUserField(fields, nombreUsuario, LITERAL.FIELD_NAME_DPS);
+		fields = retirarUserField(fields, nombreUsuario, LITERAL.FIELD_NAME_HEAL);
+		fields = retirarUserField(fields, nombreUsuario, LITERAL.FIELD_NAME_TANK);
+
+		fields = calcularParticipantes(fields);
+		embed.setFields(fields);
+
+		await message.edit({ embeds: [embed] });
+		await interaction.reply({embeds: [embedInfo], ephemeral: true});
 	}
 };
 
@@ -208,14 +279,14 @@ function getPositionField(fields, id) {
 	return;
 }
 
-function editarField(field, user) {
+function editarField(field, username) {
 	if (field.value === '' || field.value === '\u200b') field = {
 		name: field.name,
-		value: user.username,
+		value: username,
 		inline: true
 	};
 	else
-		field.value = field.value + '\n' + user.username;
+		field.value = field.value + '\n' + username;
 
 	return field;
 }
@@ -256,12 +327,12 @@ function calcularParticipantes(fields) {
 	return fields;
 }
 
-function retirarUserField(fields, user, nameField) {
+function retirarUserField(fields, username, nameField) {
 	let position = getPositionField(fields, nameField);
 	let myArray = fields[position].value.split("\n");
 	let participantes = '';
 
-	myArray = myArray.filter(e => e !== user.username);
+	myArray = myArray.filter(e => e !== username);
 
 	if (myArray.length == 0) {
 		fields[position].value = '\u200b';
