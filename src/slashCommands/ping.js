@@ -3,14 +3,6 @@ const constant = require('../constants/constants.js');
 
 const TITLE_EMBED = 'PING';
 
-const embed = {
-	color: color.BLUE,
-	title: TITLE_EMBED,
-	description: 'Calculando ping...',
-	fields: [],
-	timestamp: new Date()
-};
-
 module.exports = {
     slash : {
         name : 'ping',
@@ -19,7 +11,7 @@ module.exports = {
     },
 	reactions: false,
 	async execute(interaction,  options, client) {
-        embed.timestamp = new Date();
+        let embed = initEmbed();
         const msg = await interaction.reply({embeds : [embed], fetchReply: true});
         const pingBot = msg.createdTimestamp - interaction.createdTimestamp;
 
@@ -42,3 +34,15 @@ module.exports = {
 		await msg.edit({embeds: [embed]});
 	}
 };
+
+function initEmbed(){
+    let embed = {
+        color: color.BLUE,
+        title: TITLE_EMBED,
+        description: 'Calculando ping...',
+        fields: [],
+        timestamp: new Date()
+    };
+
+    return embed;
+}

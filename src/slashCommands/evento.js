@@ -5,30 +5,6 @@ const utils = require('../modules/Utils.js');
 
 const TITLE_EMBED = 'EVENTO';
 
-const embed = {
-	color: COLOR.BLUE,
-	title: TITLE_EMBED,
-	description: 'Ej: El domingo 23 de enero volvemos a intentar hacer grupo para realizar las primeras TRIALS del mapa de Clagorn.',
-	fields: [
-		{
-			name: LITERAL.TITLE_HORARIO,
-			value: 'Ej: Dom. 17:00 EU',
-		},
-		{
-			name: LITERAL.FIELD_NAME_PARTICIPANTES,
-			value: LITERAL.FIELD_PARTICIPANTES_TOTAL + '0',
-		},
-		{ name: LITERAL.FIELD_NAME_TANK + ' - 0', value: '\u200B', inline: true },
-		{ name: LITERAL.FIELD_NAME_DPS + ' - 0', value: '\u200B', inline: true },
-		{ name: LITERAL.FIELD_NAME_HEAL + ' - 0', value: '\u200B', inline: true },
-		{ name: '\u200b', value: '\u200b' }
-	],
-	timestamp: new Date(),
-	footer: {
-		text: 'Creado por XXX'
-	}
-};
-
 module.exports = {
 	slash : {
         name : 'evento',
@@ -64,6 +40,7 @@ module.exports = {
 	reactions: true,
 	editable: true,
 	async execute(interaction, options, client) {
+		let embed = initEmbed();
 		let titulo = options.getString('titulo');
         let descripcion = options.getString('description');
         let horario = options.getString('horario');
@@ -78,7 +55,6 @@ module.exports = {
         embed.fields[0].value = horario;
 		if(utils.isImage(urlImage)) embed.image = { url: urlImage};
         embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;
-		embed.timestamp = new Date();
 
         const msg = await interaction.reply({embeds: [embed], fetchReply: true });
 
@@ -270,6 +246,34 @@ module.exports = {
 		await interaction.reply({embeds: [embedInfo], ephemeral: true});
 	}
 };
+
+function initEmbed(){
+	let embed = {
+		color: COLOR.BLUE,
+		title: TITLE_EMBED,
+		description: 'Ej: El domingo 23 de enero volvemos a intentar hacer grupo para realizar las primeras TRIALS del mapa de Clagorn.',
+		fields: [
+			{
+				name: LITERAL.TITLE_HORARIO,
+				value: 'Ej: Dom. 17:00 EU',
+			},
+			{
+				name: LITERAL.FIELD_NAME_PARTICIPANTES,
+				value: LITERAL.FIELD_PARTICIPANTES_TOTAL + '0',
+			},
+			{ name: LITERAL.FIELD_NAME_TANK + ' - 0', value: '\u200B', inline: true },
+			{ name: LITERAL.FIELD_NAME_DPS + ' - 0', value: '\u200B', inline: true },
+			{ name: LITERAL.FIELD_NAME_HEAL + ' - 0', value: '\u200B', inline: true },
+			{ name: '\u200b', value: '\u200b' }
+		],
+		timestamp: new Date(),
+		footer: {
+			text: 'Creado por XXX'
+		}
+	};
+
+	return embed;
+}
 
 function getPositionField(fields, id) {
 	for (let i = 0; i < fields.length; i++) {

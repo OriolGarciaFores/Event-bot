@@ -4,17 +4,6 @@ const EMOJI = require('../constants/emojis.js');
 const CONSTANTS = require('../constants/constants.js');
 const LITERAL = require('../constants/literals.js');
 
-const embed = {
-	color: COLOR.GREEN,
-	title: 'VOTE',
-	description: '**¿Pregunta?**',
-	fields: [],
-	timestamp: new Date(),
-	footer: {
-		text: 'Creado por XXX'
-	}
-};
-
 const RESPUESTAS_REACTIONS = [EMOJI.A, EMOJI.B, EMOJI.C, EMOJI.D, EMOJI.E];
 const MAX_SIZE_BAR = 20;
 
@@ -62,6 +51,7 @@ module.exports = {
     },
 	reactions: true,
 	async execute(interaction, options, client) {
+		let embed = initEmbed();
         let question = options.getString("pregunta");
         let bar = utils.progressBar(0, 1, MAX_SIZE_BAR);
         let respuestas = [];
@@ -158,6 +148,21 @@ module.exports = {
 		await reaction.message.edit({ embeds: [embed] });
 	}
 };
+
+function initEmbed(){
+	let embed = {
+		color: COLOR.GREEN,
+		title: 'VOTE',
+		description: '**¿Pregunta?**',
+		fields: [],
+		timestamp: new Date(),
+		footer: {
+			text: 'Creado por XXX'
+		}
+	};
+
+	return embed;
+}
 
 function validarRespuestas(cantidadRespuestas, emoji){
 	for(let i = 0; i < cantidadRespuestas; i++){

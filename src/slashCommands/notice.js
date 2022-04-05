@@ -2,14 +2,6 @@ const color = require('../constants/colors.js');
 const constant = require('../constants/constants.js');
 const utils = require('../modules/Utils.js');
 
-const embed = {
-    color: color.BLUE,
-    author : {
-        name : 'name',
-        icon_url: 'https://i.imgur.com/AfFp7pu.png'
-    }
-}
-
 module.exports = {
 	slash : {
         name : 'notice',
@@ -38,6 +30,7 @@ module.exports = {
     },
 	reactions: true,
 	async execute(interaction, options, client) {
+        let embed = initEmbed();
         let titulo = options.getString('titulo');
         let descripcion = options.getString('description');
         let urlImage = options.getString('url_img');
@@ -54,7 +47,6 @@ module.exports = {
             embed.description = descripcion;
             embed.author.name = interaction.user.username;
             embed.author.icon_url = interaction.user.displayAvatarURL();
-            embed.image = undefined;
 
             if(utils.isImage(urlImage)) embed.image = { url: urlImage};
     
@@ -76,3 +68,14 @@ module.exports = {
 		return;
 	} 
 };
+
+function initEmbed(){
+    let embed = {
+        color: color.BLUE,
+        author : {
+            name : 'name',
+            icon_url: 'https://i.imgur.com/AfFp7pu.png'
+        }
+    }
+    return embed;
+}
