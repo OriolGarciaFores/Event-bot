@@ -107,11 +107,11 @@ module.exports = {
 				await reaction.message.edit({ embeds: [embed] });
 			}else{
 				let embedInfo = {
-					color: COLOR.BLUE,
+					color: COLOR.GREY,
 					description: 'description'
 				}
 				let embedEditable = {
-					color: COLOR.BLUE,
+					color: COLOR.GREY,
 					title: 'Escoge el numero del campo que quieras modificar',
 					fields: []
 				}
@@ -249,7 +249,7 @@ module.exports = {
 
 function initEmbed(){
 	let embed = {
-		color: COLOR.BLUE,
+		color: COLOR.GREY,
 		title: TITLE_EMBED,
 		description: 'Ej: El domingo 23 de enero volvemos a intentar hacer grupo para realizar las primeras TRIALS del mapa de Clagorn.',
 		fields: [

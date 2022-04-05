@@ -37,7 +37,7 @@ module.exports = {
 
 function initEmbed(){
     let embed = {
-        color: color.BLUE,
+        color: color.GREY,
         title: TITLE_EMBED,
         description: 'Calculando ping...',
         fields: [],

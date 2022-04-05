@@ -8,7 +8,7 @@ const embedInfo = {
 };
 
 const embedReport = {
-	color: COLOR.BLUE,
+	color: COLOR.GREY,
 	title: 'Report - ',
 	description: 'Error generic.'
 };

@@ -79,7 +79,7 @@ module.exports = {
 
 function initEmbed(){
     let embed = {
-        color: color.BLUE,
+        color: color.GREY,
         author : {
             name : 'name',
             icon_url: 'https://i.imgur.com/AfFp7pu.png'

@@ -151,7 +151,7 @@ module.exports = {
 
 function initEmbed(){
 	let embed = {
-		color: COLOR.GREEN,
+		color: COLOR.GREY,
 		title: 'VOTE',
 		description: '**¿Pregunta?**',
 		fields: [],

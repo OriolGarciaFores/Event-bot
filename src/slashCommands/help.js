@@ -2,7 +2,7 @@ const constant = require('../constants/constants.js');
 const color = require('../constants/colors.js');
 const emoji = require('../constants/emojis.js');
 const embedHelp = {
-	color: color.BLUE,
+	color: color.GREY,
 	title: 'HELP',
 	description:
 	'Lista de comandos disponibles del bot. Cualquier duda o sugerencia contactar con **Tebrase#5760**. ',
