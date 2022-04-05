@@ -1,14 +1,8 @@
 const COLOR = require('../constants/colors.js');
 const constant = require('../constants/constants.js');
 
-const embedError = {
-	color: COLOR.RED,
-	title: 'La liaste!',
-	description: 'El mensaje está vacio. El comando es !report <descripción>'
-};
-
 const embedInfo = {
-	color: COLOR.BLUE,
+	color: COLOR.GREEN,
 	title: 'Exito!',
 	description: 'Mensaje reportado.'
 };
@@ -18,7 +12,6 @@ const embedReport = {
 	title: 'Report - ',
 	description: 'Error generic.'
 };
-
 
 module.exports = {
 	slash : {
@@ -44,6 +37,6 @@ module.exports = {
 
         user.send({ embeds: [embedReport] });
 
-        await interaction.reply({embeds: [embedInfo]});;
+        await interaction.reply({embeds: [embedInfo], ephemeral: true});;
 	}
 };
