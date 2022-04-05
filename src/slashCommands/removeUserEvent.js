@@ -1,4 +1,5 @@
 const constant = require('../constants/constants.js');
+const log = require('../modules/logger');
 
 module.exports = {
     slash : {
@@ -37,8 +38,10 @@ module.exports = {
 
         if(type === 'evento'){
             await command.removeUserCustom(message, interaction, nombreUsuario);
+            log.info('Se ha retirado un usuario de un evento. Usuario retirado: ' + nombreUsuario);
         }else{
             await interaction.reply({constent: 'Error, no es posible retirar el usuario en este tipo de evento.', ephemeral: true});
+            log.error('Error, no es posible retirar el usuario en este tipo de evento.');
         }
 
 	}

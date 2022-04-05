@@ -2,6 +2,7 @@ const LITERAL = require('../constants/literals.js');
 const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
 const utils = require('../modules/Utils.js');
+const log = require('../modules/logger');
 
 const TITLE_EMBED = 'EVENTO';
 
@@ -63,6 +64,8 @@ module.exports = {
         msg.react(CONSTANTS.HEAL);
 		msg.react(CONSTANTS.EDIT_REACT);
         msg.react(CONSTANTS.DELETE_REACT);
+
+		log.info('Se ha generado un /evento.');
 	},
 	async reactionAdd(reaction, user){
 		let embed = reaction.message.embeds[0];
@@ -155,8 +158,12 @@ module.exports = {
 		embed.setFields(fields);
 		await reaction.message.edit({ embeds: [embed] });
 	},
-	async edit(message, campoId, contenido){
+	async edit(interaction, message, campoId, contenido){
 		let embed = message.embeds[0];
+		const embedInfo = {
+			color: COLOR.GREEN,
+			description: 'Mensaje modificado.'
+		}
 
 		switch (campoId) {
             case '1':
@@ -171,9 +178,18 @@ module.exports = {
             case '4':
                 if(utils.isImage(urlImage)) embed.image = { url: contenido};
                 break;
+			default:
+				log.error('/evento editar -> CAMPO_ID incorrecto.');
+				
+				embed.color = COLOR.RED;
+				embed.description = 'CAMPO_ID incorrecto.';
+
+				return await interaction.reply({embeds: [embedInfo], ephemeral: true});
         }
 
         await message.edit({embeds: [embed]});
+		await interaction.reply({embeds: [embedInfo], ephemeral: true });
+		log.info('Se ha modificado un bloque de texto bot.');
 	},
 	async addUserCustom(message, interaction, nombreUsuario, rol){
 		let embed = message.embeds[0];

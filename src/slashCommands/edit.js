@@ -1,5 +1,6 @@
 const constant = require('../constants/constants.js');
 const utils = require('../modules/Utils.js');
+const log = require('../modules/logger');
 
 module.exports = {
     slash : {
@@ -39,9 +40,9 @@ module.exports = {
 
         if (!command || !command.editable) {
             await interaction.reply({content: 'No se puede modificar.', fetchReply: true, ephemeral: true });
+            log.warn('No se ha podido modificar un bloque de texto bot.');
         }else{
-            await command.edit(message, campoId, contenido);
-            await interaction.reply({content: 'Mensaje modificado.', fetchReply: true, ephemeral: true });
+            await command.edit(interaction, message, campoId, contenido);
         }
 	}
 };
