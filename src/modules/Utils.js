@@ -52,9 +52,12 @@ function progressBar (value, maxValue, size) {
     return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
   }
 
+  function isUrl(url){
+    return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(url);
+  }
 
 
 
 
 
-module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError, isImage}
+module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError, isImage, isUrl}

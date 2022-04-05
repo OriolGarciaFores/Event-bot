@@ -9,7 +9,7 @@ module.exports = {
 		type : constant.SLASH_TYPE_INPUT,
         options : [
             {
-                name : "titulo",
+                name : "title",
                 description : "Título del mensaje.",
                 type : constant.SLASH_OPTION_TYPE_STRING,
                 required : false
@@ -20,6 +20,12 @@ module.exports = {
                 type : constant.SLASH_OPTION_TYPE_STRING,
                 required : false
             },
+            {
+				name : "url_title",
+				description : "URL para añadir un enlace al titulo.",
+				type : constant.SLASH_OPTION_TYPE_STRING,
+				required : false
+			},
 			{
 				name : "url_img",
 				description : "URL para añadir una imagen al evento.",
@@ -31,8 +37,9 @@ module.exports = {
 	reactions: true,
 	async execute(interaction, options, client) {
         let embed = initEmbed();
-        let titulo = options.getString('titulo');
+        let titulo = options.getString('title');
         let descripcion = options.getString('description');
+        let urlTitle = options.getString('url_title');
         let urlImage = options.getString('url_img');
 
         if(titulo == undefined && descripcion == undefined){
@@ -49,6 +56,7 @@ module.exports = {
             embed.author.icon_url = interaction.user.displayAvatarURL();
 
             if(utils.isImage(urlImage)) embed.image = { url: urlImage};
+            if(utils.isUrl(urlTitle)) embed.url = urlTitle;
     
             await interaction.reply({embeds: [embed]});
         }
