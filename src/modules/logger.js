@@ -9,6 +9,7 @@ function info(content){
 
 function error(content){
     if(process.env.LOG_ERROR) {
+        let fecha = new Date();
         console.log(COLOR.RED, '[ERROR][' + fecha.toLocaleString() + '] ' + content);
     }
 }
