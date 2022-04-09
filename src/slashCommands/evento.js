@@ -74,10 +74,19 @@ module.exports = {
 		let creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
+		let member = await reaction.message.guild.members.fetch(user.id);
 
 		if (emoji === CONSTANTS.DELETE_REACT){
 			if(userId === creadorEmber) reaction.message.delete();
 			else reaction.message.reactions.resolve(emoji).users.remove(user.id);
+		}
+
+		if(emoji === CONSTANTS.EDIT_REACT){
+			if(userId != creadorEmber && !utils.validateMemberPermissionEdit(member) ){
+				log.debug('Usuario sin permiso de edición.');
+				reaction.message.reactions.resolve(emoji).users.remove(user.id);
+				return;
+			}
 		}
 
 		if(oldReactionUser !== undefined && emoji !== CONSTANTS.EDIT_REACT) {
@@ -160,36 +169,47 @@ module.exports = {
 	},
 	async edit(interaction, message, campoId, contenido){
 		let embed = message.embeds[0];
+		let creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
+		let user = interaction.user;
+		let userNameNumber = user.username + '#' + user.discriminator;
+		let member = await message.guild.members.fetch(user.id);
 		const embedInfo = {
 			color: COLOR.GREEN,
 			description: 'Mensaje modificado.'
 		}
 
-		switch (campoId) {
-            case '1':
-                embed.title = embed.title.split(' - ')[0] + ' - ' + contenido;
-                break;
-            case '2':
-                embed.description = contenido;
-                break;
-            case '3':
-                embed.fields[0].value = contenido;
-                break;
-            case '4':
-                if(utils.isImage(urlImage)) embed.image = { url: contenido};
-                break;
-			default:
-				log.error('/evento editar -> CAMPO_ID incorrecto.');
-				
-				embed.color = COLOR.RED;
-				embed.description = 'CAMPO_ID incorrecto.';
-
-				return await interaction.reply({embeds: [embedInfo], ephemeral: true});
-        }
-
-        await message.edit({embeds: [embed]});
-		await interaction.reply({embeds: [embedInfo], ephemeral: true });
-		log.info('Se ha modificado un bloque de texto bot.');
+		if(userNameNumber != creadorEmber && !utils.validateMemberPermissionEdit(member) ){
+			embedInfo.color = COLOR.RED;
+			embedInfo.description = 'No tienes permisos para editar.';
+			log.debug('Usuario sin permiso de edición.');
+			await interaction.reply({embeds: [embedInfo], ephemeral: true });
+		}else{
+			switch (campoId) {
+				case '1':
+					embed.title = embed.title.split(' - ')[0] + ' - ' + contenido;
+					break;
+				case '2':
+					embed.description = contenido;
+					break;
+				case '3':
+					embed.fields[0].value = contenido;
+					break;
+				case '4':
+					if(utils.isImage(urlImage)) embed.image = { url: contenido};
+					break;
+				default:
+					log.error('/evento editar -> CAMPO_ID incorrecto.');
+					
+					embed.color = COLOR.RED;
+					embed.description = 'CAMPO_ID incorrecto.';
+	
+					return await interaction.reply({embeds: [embedInfo], ephemeral: true});
+			}
+	
+			await message.edit({embeds: [embed]});
+			await interaction.reply({embeds: [embedInfo], ephemeral: true });
+			log.info('Se ha modificado un bloque de texto bot.');
+		}
 	},
 	async addUserCustom(message, interaction, nombreUsuario, rol){
 		let embed = message.embeds[0];

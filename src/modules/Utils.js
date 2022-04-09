@@ -1,5 +1,6 @@
 const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
+const { Permissions } = require('discord.js');
 
 function progressBar (value, maxValue, size) {
     if(maxValue <= 0) maxValue = 1;
@@ -56,8 +57,9 @@ function progressBar (value, maxValue, size) {
     return /[-a-zA-Z0-9@:%_\+.~#?&//=]{2,256}\.[a-z]{2,4}\b(\/[-a-zA-Z0-9@:%_\+.~#?&//=]*)?/gi.test(url);
   }
 
+  function validateMemberPermissionEdit(member){
+    return member.permissions.has(['MANAGE_MESSAGES']);
+  }
 
 
-
-
-module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError, isImage, isUrl}
+module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError, isImage, isUrl, validateMemberPermissionEdit}
