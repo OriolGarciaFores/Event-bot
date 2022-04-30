@@ -50,7 +50,9 @@ const TYPE_REACTION_REMOVE = 'messageReactionRemove';
 
 client.once("ready", () => {
 	log.info("INICIADO");
-	client.user.setActivity('/help | Version: 1.3.1', { type: 'PLAYING' });
+	client.user.setActivity('/help | Version: 1.4.0', { type: 'PLAYING' });
+
+	loadCache();
 });
 
 client.on('interactionCreate', async interaction => {
@@ -110,6 +112,45 @@ client.on('guildMemberAdd', async member => {
 		log.error("Error guildMemberAdd: " + e);
 	}
 });
+
+function loadCache(){
+	fs.readFile('./src/resources/cache/guildsMessages.json', async (err, data) => {
+		if (err) log.error(err);
+		if(data.length != 0) {
+
+		let dataCache = JSON.parse(data);
+		let guildsCache = dataCache.guilds;
+
+		if(guildsCache.length != 0){
+			for (const value of guildsCache){
+				const guild = await client.guilds.fetch(value.guildId);
+
+				if(guild == undefined){
+					log.warn("No se ha encontrado la guild en cache.");
+				}else{
+					let channels = value.channelsId;
+	
+					for(let id = 0; id < channels.length; id++){
+						const channel = guild.channels.cache.get(channels[id]);
+	
+						if(channel == undefined){
+							log.warn("No se ha encontrado el channel en cache.");
+						}else{
+							await channel.messages.fetch();
+						}
+					}
+				}
+			}
+	
+			log.info("Carga cache de las Guilds.");	
+		}else{
+			log.info("No hay cache.");
+		}
+		}else{
+			log.info("No hay cache.");
+		}
+	});
+}
 
 function getCommand(content) {
 	return content.split(' ')[0];

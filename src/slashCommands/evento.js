@@ -3,6 +3,7 @@ const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
 const utils = require('../modules/Utils.js');
 const log = require('../modules/logger');
+const fs = require('fs');
 
 const TITLE_EMBED = 'EVENTO';
 
@@ -64,6 +65,8 @@ module.exports = {
         msg.react(CONSTANTS.HEAL);
 		msg.react(CONSTANTS.EDIT_REACT);
         msg.react(CONSTANTS.DELETE_REACT);
+
+		guardarCache(msg);
 
 		log.info('Se ha generado un /evento.');
 	},
@@ -310,6 +313,64 @@ function initEmbed(){
 
 	return embed;
 }
+
+function guardarCache(message){
+	fs.readFile('./src/resources/cache/guildsMessages.json', async (err, data) => {
+		if (err) log.error(err);
+		if (data.length != 0) {
+			let dataCache = JSON.parse(data);
+			let guildsCache = dataCache.guilds;
+			let guildId = message.guildId;
+			let channelId = message.channelId;
+			let guildExist = false;
+			let channelExist = false;
+
+			for (const guildCache of guildsCache){
+				if(guildCache.guildId == guildId){
+					let channels = guildCache.channelsId;
+					guildExist = true;
+
+					if(channels.includes(channelId)){
+						channelExist = false;
+						break;
+					}else{
+						guildCache.channelsId.push(channelId);
+						break;
+					}
+				}else{
+
+				}
+			}
+
+			if(!guildExist){
+				let guild = {
+					"guildId" : guildId,
+					"channelsId" : [channelId]
+				}
+
+				guildsCache.push(guild);
+			}
+
+			let guilds = {
+				"guilds": guildsCache
+			}
+			
+
+			if(!guildExist || !channelExist){
+				let dataJson = JSON.stringify(guilds);
+				fs.writeFileSync('./src/resources/cache/guildsMessages.json', dataJson);
+			}
+
+		} else {
+			log.info("No hay cache.");
+		}
+	});
+
+	 
+	
+}
+
+
 
 function getPositionField(fields, id) {
 	for (let i = 0; i < fields.length; i++) {
