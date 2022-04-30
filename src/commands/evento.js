@@ -32,27 +32,7 @@ module.exports = {
 	name: 'evento',
 	reactions: true,
 	async execute(message, content, client) {
-		let commandDesc = content.includes(CONSTANTS.COMANDO_DESCRIPCION);
-		let commandTime = content.includes(CONSTANTS.COMANDO_TIEMPO);
-
-		if (!commandDesc || !commandTime) {
-			let error = 'Comando incorrecto !evento -d descripcion -t horario';
-
-			await message.channel.send({embeds: [utils.generarMensajeError(error)]});
-		} else {
-			let descripcion = getPartText(CONSTANTS.COMANDO_DESCRIPCION, content);
-			let horario = getPartText(CONSTANTS.COMANDO_TIEMPO, content);
-
-			embed.description = descripcion;
-			embed.fields[0].value = horario;
-			embed.footer.text = LITERAL.FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
-			const msg = await message.channel.send({ content: constants.TEXT_WARNING_DEPRECATE_COMMAND, embeds: [embed], fetchReply: true });
-
-			msg.react(CONSTANTS.TANK);
-			msg.react(CONSTANTS.DPS);
-			msg.react(CONSTANTS.HEAL);
-			msg.react(CONSTANTS.DELETE_REACT);
-		}
+		await message.reply(constants.TEXT_WARNING_DEPRECATE_COMMAND);
 	},
 	async reactionAdd(reaction, user){
 		var embed = reaction.message.embeds[0];

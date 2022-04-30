@@ -22,37 +22,7 @@ module.exports = {
 	name: 'vote',
 	reactions: true,
 	async execute(message, content, client) {
-		let question = content.substring(content.indexOf('vote') + 'vote'.length + 1, content.indexOf('-r'));
-		let respuestas = content.split(' -r ');
-		respuestas.shift();
-
-		if (!validarRequisitos(question, respuestas)) {
-			let error = 'No cumple con los requisitos. !vote <pregunta> -r <respuesta> (Entre 2-5).';
-
-			await message.channel.send({embeds: [utils.generarMensajeError(error)]});
-		} else {
-			let bar = utils.progressBar(0, 1, MAX_SIZE_BAR);
-			embed.fields = [];
-
-			embed.description = utils.textNegrita(question);
-
-			for (let i = 0; i < respuestas.length; i++) {
-				let field = {
-					name: RESPUESTAS_REACTIONS[i] + ' ' + respuestas[i],
-					value: bar + ' V: 0'
-				}
-
-				embed.fields[i] = field;
-			}
-			embed.footer.text = LITERAL.FOOTER_TEXT + message.author.username + '#' + message.author.discriminator;
-
-			const msg = await message.channel.send({content: CONSTANTS.TEXT_WARNING_DEPRECATE_COMMAND, embeds: [embed], fetchReply: true });
-
-			for (let i = 0; i < respuestas.length; i++) {
-				msg.react(RESPUESTAS_REACTIONS[i]);
-			}
-			msg.react(CONSTANTS.DELETE_REACT);
-		}
+		await message.reply(CONSTANTS.TEXT_WARNING_DEPRECATE_COMMAND);
 	},
 	async reactionAdd(reaction, user) {
 		const OPERATION = '+';

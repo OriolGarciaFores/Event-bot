@@ -16,6 +16,6 @@ module.exports = {
     SLASH_OPTION_TYPE_BOOLEAN : 5,
     SLASH_OPTION_TYPE_USER : 6,
     SLASH_OPTION_TYPE_CHANNEL : 7,
-    TEXT_WARNING_DEPRECATE_COMMAND : 'Comandos con `!` están en desuso y se van a eliminar. Intenta usar los nuevos `/`.\n Más información `/help`. \n ' +
-                                    'Si no aparecen los nuevos comandos, hace falta volver a invitar el bot.'
+    TEXT_WARNING_DEPRECATE_COMMAND : '⚠️⚠️⚠️Comandos con `!` no están soportados por Discord y se han a eliminado. Intenta usar los nuevos `/`.\n Más información `/help`. \n ' +
+                                    'Si no aparecen los nuevos comandos en la barra de texto de Discord, hace falta volver a invitar el bot.'
 }

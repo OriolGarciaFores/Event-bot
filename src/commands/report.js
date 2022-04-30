@@ -24,21 +24,7 @@ module.exports = {
 	name: 'report',
 	reactions: false,
 	async execute(message, content, client) {
-        const user = await client.users.fetch(process.env.ID_OWNER);
-        content = deleteComand(content);
-        
-        if(content === ''){ 
-            await message.channel.send({embeds: [embedError]});
-            return;
-        }
-        else {
-            let remitente = message.author.username + '#' + message.author.discriminator;
-            embedReport.title = 'Report - ' + remitente;
-            embedReport.description = content;
-            user.send({embeds: [embedReport]});
-        }
-
-        await message.channel.send({content: constants.TEXT_WARNING_DEPRECATE_COMMAND,embeds: [embedInfo]});;
+        await message.reply(constants.TEXT_WARNING_DEPRECATE_COMMAND);
 	}
 };
 

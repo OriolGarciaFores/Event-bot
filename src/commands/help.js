@@ -46,7 +46,7 @@ module.exports = {
 	name: 'help',
 	reactions: true,
 	async execute(message,  content, client) {
-		return message.channel.send({embeds: [embedHelp]});;
+		await message.reply(CONSTANTS.TEXT_WARNING_DEPRECATE_COMMAND);
 	},
 	async reactionAdd(reaction, user){
 		await reaction.message.reactions.resolve(EMOJIS.RELOAD).users.remove(user.id);
