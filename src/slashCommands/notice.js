@@ -43,7 +43,7 @@ module.exports = {
         let urlImage = options.getString('url_img');
 
         if(titulo == undefined && descripcion == undefined){
-            await interaction.reply({content : 'Requiere informar minimo un titulo o descripción.', ephemeral: true});
+            await interaction.reply({content : 'Requiere informar minimo un título o descripción.', ephemeral: true});
         }else{
             if(descripcion != undefined) 
                 descripcion = descripcion.replaceAll('\\n', '\n');

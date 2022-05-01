@@ -127,7 +127,7 @@ module.exports = {
 				}
 				let embedEditable = {
 					color: COLOR.GREY,
-					title: 'Escoge el numero del campo que quieras modificar',
+					title: 'Escoge el número del campo que quieras modificar',
 					fields: []
 				}
 				const channelId = reaction.message.channelId;
@@ -137,10 +137,10 @@ module.exports = {
 				const image_url = embed.image !== null ? embed.image.url : '\u200B';
 
 				embedInfo.description = 'Ejecuta el comando /edit con el campo messageId: **' + messageId +
-					'** el numero del campo que deseas editar y el texto que quieras que salga en el canal del evento creado. ' +
+					'** el número del campo que deseas editar y el texto que quieras que salga en el canal del evento creado. ' +
 					'[' + tituloEvento + '](https://discord.com/channels/' + guildId + '/' + channelId + '/' + messageId + ')';
 
-				embedEditable.fields[0] = { name: '1 - Titulo', value: '```' + embed.title + '```' }
+				embedEditable.fields[0] = { name: '1 - Título', value: '```' + embed.title + '```' }
 				embedEditable.fields[1] = { name: '2 - Descripción', value: '```' + embed.description + '```' }
 				embedEditable.fields[2] = { name: '3 - Horario', value: '```' + embed.fields[0].value + '```' }
 				embedEditable.fields[3] = { name: '4 - Url imagen', value: '```' + image_url + '```' }

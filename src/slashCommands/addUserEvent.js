@@ -1,6 +1,7 @@
 const constant = require('../constants/constants.js');
 const color = require('../constants/colors.js');
 const log = require('../modules/logger');
+const literal = require('../constants/literals.js');
 
 module.exports = {
     slash : {
@@ -62,8 +63,8 @@ module.exports = {
             await command.addUserCustom(message, interaction, nombreUsuario, rol);
             log.info('Se ha añadido un usuario a un evento. Usuario añadido: ' + nombreUsuario);
         }else{
-            await interaction.reply({constent: 'Error, no es posible añadir el usuario en este tipo de evento.', ephemeral: true});
-            log.error('Error, no es posible añadir el usuario en este tipo de evento.');
+            await interaction.reply({constent: literal.ERROR_ADD_USER_EVENT, ephemeral: true});
+            log.error(literal.ERROR_ADD_USER_EVENT);
         }        
 	}
 };

@@ -7,5 +7,6 @@ module.exports = {
     FIELD_NAME_PARTICIPANTES : 'PARTICIPANTES',
     FIELD_PARTICIPANTES_TOTAL : '**Total:** ',
     FOOTER_TEXT : 'Creado por ',
-    TITLE_HORARIO : 'HORARIO'
+    TITLE_HORARIO : 'HORARIO',
+    ERROR_ADD_USER_EVENT : 'Error, no es posible añadir el usuario en este tipo de evento.'
 }
