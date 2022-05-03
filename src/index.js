@@ -1,7 +1,10 @@
 const { Client, Intents, Collection } = require('discord.js');
 const fs = require('fs');
-const { prefix } = require('../config.json');
+const mongoose = require('mongoose');
+const { prefix } = require('../config.json'); //DEPRECATED
+const config = require('../config');
 const log = require('./modules/logger');
+const serviceGuild = require('./dataBase/services/serviceGuild');
 
 require("./deploySlashCommands.js");
 require("dotenv").config();
@@ -10,25 +13,6 @@ const client = new Client({
 	 intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS],
 	 partials: ['REACTION', 'MESSAGE'] 
 	});
-
-client.commands = new Collection();
-client.slashCommands = new Collection();
-
-const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js'));
-
-for (const file of commandFiles) {
-	const command = require(`./commands/${file}`);
-	client.commands.set(command.name, command);
-}
-
-const slashCommandFiles = fs.readdirSync('./src/slashCommands').filter(file => file.endsWith('.js'));
-
-for (const file of slashCommandFiles) {
-	const moduleSlash = require(`./slashCommands/${file}`);
-	const slash = moduleSlash.slash;
-
-	client.slashCommands.set(slash.name, moduleSlash);
-}
 
 const embedError = {
 	color: 0xff0000,
@@ -48,9 +32,46 @@ const embedWelcome = {
 const TYPE_REACTION_ADD = 'messageReactionAdd';
 const TYPE_REACTION_REMOVE = 'messageReactionRemove';
 
+client.commands = new Collection();//DEPRECATED
+client.slashCommands = new Collection();
+
+const init = async () => {
+	const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js')); //DEPRECATED
+
+	//DEPRECATED
+	for (const file of commandFiles) {
+		const command = require(`./commands/${file}`);
+		client.commands.set(command.name, command);
+	}
+	
+	const slashCommandFiles = fs.readdirSync('./src/slashCommands').filter(file => file.endsWith('.js'));
+	
+	for (const file of slashCommandFiles) {
+		const moduleSlash = require(`./slashCommands/${file}`);
+		const slash = moduleSlash.slash;
+	
+		log.info(`Loading... SlashCommand: ${file}`);
+		client.slashCommands.set(slash.name, moduleSlash);
+		log.correct(`Loaded /${slash.name} OK`);
+	}
+
+	client.login(config.token);
+	
+	mongoose.connect(config.mongoDB, {
+		useNewUrlParser: true,
+		useUnifiedTopology: true
+	}).then(() => {
+		log.correct('Connected to MongoDB')
+	}).catch((err) => {
+		log.error('Unable to connect to MongoDB Database.\nError: ' + err)
+	});
+}
+
+init();
+
 client.once("ready", () => {
 	log.info("INICIADO");
-	client.user.setActivity('/help | Version: 1.5.0', { type: 'PLAYING' });
+	client.user.setActivity(config.status.description + config.status.version, { type: config.status.type });
 
 	loadCache();
 });
@@ -70,6 +91,7 @@ client.on('interactionCreate', async interaction => {
 	}
 });
 
+//DEPRECATED
 client.on('messageCreate', async message => {
 	if (!message.content.startsWith(prefix)) return;
 	if (message.author.bot) return;
@@ -113,43 +135,34 @@ client.on('guildMemberAdd', async member => {
 	}
 });
 
-function loadCache(){
-	fs.readFile('./src/resources/cache/guildsMessages.json', async (err, data) => {
-		if (err) log.error(err);
-		if(data.length != 0) {
+async function loadCache(){
+	let guilds = await serviceGuild.findAll();
 
-		let dataCache = JSON.parse(data);
-		let guildsCache = dataCache.guilds;
+	if(guilds.length != 0){
+		for (let i = 0; i < guilds.length; i++){
+			const guild = await client.guilds.fetch(guilds[i].id);
 
-		if(guildsCache.length != 0){
-			for (const value of guildsCache){
-				const guild = await client.guilds.fetch(value.guildId);
+			if(guild == undefined){
+				log.warn("No se ha encontrado la guild en cache.");
+			}else{
+				let channels = guilds[i].channelsId;
 
-				if(guild == undefined){
-					log.warn("No se ha encontrado la guild en cache.");
-				}else{
-					let channels = value.channelsId;
-	
-					for(let id = 0; id < channels.length; id++){
-						const channel = guild.channels.cache.get(channels[id]);
-	
-						if(channel == undefined){
-							log.warn("No se ha encontrado el channel en cache.");
-						}else{
-							await channel.messages.fetch();
-						}
+				for(let id = 0; id < channels.length; id++){
+					const channel = guild.channels.cache.get(channels[id]);
+
+					if(channel == undefined){
+						log.warn("No se ha encontrado el channel en cache.");
+					}else{
+						await channel.messages.fetch();
 					}
 				}
 			}
-	
-			log.info("Carga cache de las Guilds.");	
-		}else{
-			log.info("No hay cache.");
 		}
-		}else{
-			log.info("No hay cache.");
-		}
-	});
+
+		log.info("Carga cache de las Guilds.");	
+	}else{
+		log.info("No hay guilds para cargar en cache.");
+	}
 }
 
 function getCommand(content) {
@@ -191,5 +204,3 @@ async function reactions(type, message, reaction, user) {
 	}
 
 }
-
-client.login(process.env.TOKEN);

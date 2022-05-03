@@ -3,7 +3,7 @@ const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
 const utils = require('../modules/Utils.js');
 const log = require('../modules/logger');
-const fs = require('fs');
+const serviceGuild = require('../dataBase/services/serviceGuild');
 
 const TITLE_EMBED = 'EVENTO';
 
@@ -315,59 +315,22 @@ function initEmbed(){
 }
 
 function guardarCache(message){
-	fs.readFile('./src/resources/cache/guildsMessages.json', async (err, data) => {
-		if (err) log.error(err);
-		if (data.length != 0) {
-			let dataCache = JSON.parse(data);
-			let guildsCache = dataCache.guilds;
-			let guildId = message.guildId;
-			let channelId = message.channelId;
-			let guildExist = false;
-			let channelExist = false;
-
-			for (const guildCache of guildsCache){
-				if(guildCache.guildId == guildId){
-					let channels = guildCache.channelsId;
-					guildExist = true;
-
-					if(channels.includes(channelId)){
-						channelExist = false;
-						break;
-					}else{
-						guildCache.channelsId.push(channelId);
-						break;
-					}
-				}else{
-
-				}
+	serviceGuild.findById(message.guildId).then(guild => {
+		if(guild){
+			if(!guild.channelsId.includes(message.channelId)){
+				guild.channelsId.push(message.channelId);
+				
+				serviceGuild.updateChannelsId(guild.id, guild.channelsId);
 			}
+		}else{
+			guild = {
+				id: message.guildId,
+				channelsId: [message.channelId]
+			};
 
-			if(!guildExist){
-				let guild = {
-					"guildId" : guildId,
-					"channelsId" : [channelId]
-				}
-
-				guildsCache.push(guild);
-			}
-
-			let guilds = {
-				"guilds": guildsCache
-			}
-			
-
-			if(!guildExist || !channelExist){
-				let dataJson = JSON.stringify(guilds);
-				fs.writeFileSync('./src/resources/cache/guildsMessages.json', dataJson);
-			}
-
-		} else {
-			log.info("No hay cache.");
+			serviceGuild.create(guild);
 		}
 	});
-
-	 
-	
 }
 
 
