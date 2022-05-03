@@ -34,9 +34,7 @@ module.exports = {
         const campoId = options.getString('campo_id');
         const contenido = options.getString('contenido');
         const message = await client.channels.cache.get(interaction.channelId).messages.fetch(messageId);
-        const embed = message.embeds[0];
-        const type = embed.title.toLowerCase().split(' - ')[0];
-        const command = client.slashCommands.get(type);
+        const command = client.slashCommands.get(message.interaction.commandName);
 
         if (!command || !command.editable) {
             await interaction.reply({content: 'No se puede modificar.', fetchReply: true, ephemeral: true });

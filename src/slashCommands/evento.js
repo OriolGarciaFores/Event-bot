@@ -187,7 +187,7 @@ module.exports = {
 		}else{
 			switch (campoId) {
 				case '1':
-					embed.title = embed.title.split(' - ')[0] + ' - ' + contenido;
+					embed.title = contenido;
 					break;
 				case '2':
 					embed.description = contenido;
