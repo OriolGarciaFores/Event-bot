@@ -188,12 +188,12 @@ async function reactions(type, message, reaction, user) {
 	try {
 		if(!message.author.bot || message.author.id !== client.user.id) return;
 
-		let embed = message.embeds[0];
+		let embed = message.embeds[0];//DEPRECATED
 		let command;
 
 		if (message.interaction !== null && message.interaction.type === 'APPLICATION_COMMAND')
-			command = client.slashCommands.get(embed.title.toLowerCase().split(' ')[0]);
-		else command = client.commands.get(embed.title.toLowerCase());
+			command = client.slashCommands.get(message.interaction.commandName);
+		else command = client.commands.get(embed.title.toLowerCase());//DEPRECATED
 
 		if (!command || !command.reactions) return;
 

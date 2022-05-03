@@ -48,9 +48,7 @@ module.exports = {
             if(descripcion != undefined) 
                 descripcion = descripcion.replaceAll('\\n', '\n');
                 
-            if(titulo != undefined) embed.title = 'NOTICE - ' + titulo;
-            else embed.title = 'NOTICE';
-
+            embed.title = titulo;
             embed.description = descripcion;
             embed.author.name = interaction.user.username;
             embed.author.icon_url = interaction.user.displayAvatarURL();

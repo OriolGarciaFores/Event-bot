@@ -4,6 +4,7 @@ const EMOJI = require('../constants/emojis.js');
 const CONSTANTS = require('../constants/constants.js');
 const LITERAL = require('../constants/literals.js');
 const log = require('../modules/logger');
+const serviceGuild = require('../dataBase/services/serviceGuild');
 
 const RESPUESTAS_REACTIONS = [EMOJI.A, EMOJI.B, EMOJI.C, EMOJI.D, EMOJI.E];
 const MAX_SIZE_BAR = 20;
@@ -67,7 +68,7 @@ module.exports = {
         }
 
         embed.fields = [];
-        embed.description = utils.textNegrita(question);
+        embed.title = question;
 
         for (let i = 0; i < respuestas.length; i++) {
             let field = {
@@ -88,6 +89,8 @@ module.exports = {
         }
 
         msg.react(CONSTANTS.DELETE_REACT);
+
+		guardarCache(msg);
 		log.info('Se ha generado un /vote.');
 	},
 	async reactionAdd(reaction, user) {
@@ -155,8 +158,6 @@ module.exports = {
 function initEmbed(){
 	let embed = {
 		color: COLOR.GREY,
-		title: 'VOTE',
-		description: '**¿Pregunta?**',
 		fields: [],
 		timestamp: new Date(),
 		footer: {
@@ -165,6 +166,25 @@ function initEmbed(){
 	};
 
 	return embed;
+}
+
+function guardarCache(message){
+	serviceGuild.findById(message.guildId).then(guild => {
+		if(guild){
+			if(!guild.channelsId.includes(message.channelId)){
+				guild.channelsId.push(message.channelId);
+				
+				serviceGuild.updateChannelsId(guild.id, guild.channelsId);
+			}
+		}else{
+			guild = {
+				id: message.guildId,
+				channelsId: [message.channelId]
+			};
+
+			serviceGuild.create(guild);
+		}
+	});
 }
 
 function validarRespuestas(cantidadRespuestas, emoji){

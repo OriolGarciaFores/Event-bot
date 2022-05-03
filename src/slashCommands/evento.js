@@ -5,8 +5,6 @@ const utils = require('../modules/Utils.js');
 const log = require('../modules/logger');
 const serviceGuild = require('../dataBase/services/serviceGuild');
 
-const TITLE_EMBED = 'EVENTO';
-
 module.exports = {
 	slash : {
         name : 'evento',
@@ -52,7 +50,7 @@ module.exports = {
 
 		if(interaction.guildId === null) return;
 
-		embed.title = TITLE_EMBED + ' - ' + titulo;
+		embed.title = titulo;
         embed.description = descripcion;
         embed.fields[0].value = horario;
 		if(utils.isImage(urlImage)) embed.image = { url: urlImage};
@@ -289,8 +287,6 @@ module.exports = {
 function initEmbed(){
 	let embed = {
 		color: COLOR.GREY,
-		title: TITLE_EMBED,
-		description: 'Ej: El domingo 23 de enero volvemos a intentar hacer grupo para realizar las primeras TRIALS del mapa de Clagorn.',
 		fields: [
 			{
 				name: LITERAL.TITLE_HORARIO,
