@@ -49,7 +49,7 @@ module.exports = {
         let urlTitle = options.getString('url_title');
         let urlImage = options.getString('url_img');
         let menciones = options.getString('menciones');
-        const mencionesList = menciones.split(/ +/);
+        let mencionesValidas = "";
 
         if(titulo == undefined && descripcion == undefined){
             await interaction.reply({content : 'Requiere informar minimo un título o descripción.', ephemeral: true});
@@ -62,12 +62,17 @@ module.exports = {
             embed.author.name = interaction.user.username;
             embed.author.icon_url = interaction.user.displayAvatarURL();
 
-            let mencionesValidas = await obtenerListaMenciones(client, mencionesList, interaction.guildId);
+            if(menciones){
+                const mencionesList = menciones.split(/ +/);
+
+                mencionesValidas = await obtenerListaMenciones(client, mencionesList, interaction.guildId);
+            }
 
             if(utils.isImage(urlImage)) embed.image = { url: urlImage};
             if(utils.isUrl(urlTitle)) embed.url = urlTitle;
-
-            await interaction.reply({embeds: [embed], content: mencionesValidas});
+            if(mencionesValidas != "") await interaction.reply({embeds: [embed], content: mencionesValidas});
+            else await interaction.reply({embeds: [embed]});
+            
         }
 	},
 	async reactionAdd(reaction, user){
