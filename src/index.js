@@ -36,15 +36,7 @@ client.commands = new Collection();//DEPRECATED
 client.slashCommands = new Collection();
 
 const init = async () => {
-	const commandFiles = fs.readdirSync('./src/commands').filter(file => file.endsWith('.js')); //DEPRECATED
-
-	//DEPRECATED
-	for (const file of commandFiles) {
-		const command = require(`./commands/${file}`);
-		client.commands.set(command.name, command);
-	}
-	
-	const slashCommandFiles = fs.readdirSync('./src/slashCommands').filter(file => file.endsWith('.js'));
+    const slashCommandFiles = fs.readdirSync('./src/slashCommands').filter(file => file.endsWith('.js'));
 	
 	for (const file of slashCommandFiles) {
 		const moduleSlash = require(`./slashCommands/${file}`);
@@ -88,25 +80,6 @@ client.on('interactionCreate', async interaction => {
 		await command.execute(interaction, options, client);
 	} catch (e) {
 		log.error(e);
-	}
-});
-
-//DEPRECATED
-client.on('messageCreate', async message => {
-	if (!message.content.startsWith(prefix)) return;
-	if (message.author.bot) return;
-
-	try {
-		let content = message.content;
-		content = content.substring(1);
-		let commandName = getCommand(content);
-		const command = client.commands.get(commandName);
-		if(!command) return;
-		await command.execute(message, content, client);
-	} catch (e) {
-		console.log(e);
-		embedError.description= 'Error al crear un comando!';
-		await message.channel.send({embeds: [embedError]});
 	}
 });
 
@@ -188,12 +161,10 @@ async function reactions(type, message, reaction, user) {
 	try {
 		if(!message.author.bot || message.author.id !== client.user.id) return;
 
-		let embed = message.embeds[0];//DEPRECATED
 		let command;
 
 		if (message.interaction !== null && message.interaction.type === 'APPLICATION_COMMAND')
 			command = client.slashCommands.get(message.interaction.commandName);
-		else command = client.commands.get(embed.title.toLowerCase());//DEPRECATED
 
 		if (!command || !command.reactions) return;
 
