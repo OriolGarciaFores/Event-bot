@@ -1,6 +1,7 @@
 const color = require('../constants/colors.js');
 const constant = require('../constants/constants.js');
 const utils = require('../modules/Utils.js');
+const log = require('../modules/logger');
 
 module.exports = {
 	slash : {
@@ -17,6 +18,12 @@ module.exports = {
             {
                 name : "description",
                 description : "Descripción del mensaje a enviar.",
+                type : constant.SLASH_OPTION_TYPE_STRING,
+                required : false
+            },
+            {
+                name : "menciones",
+                description : "Para añadir lista de menciones que notificar (@everyone, @rol, @usuario, etc...).",
                 type : constant.SLASH_OPTION_TYPE_STRING,
                 required : false
             },
@@ -41,6 +48,8 @@ module.exports = {
         let descripcion = options.getString('description');
         let urlTitle = options.getString('url_title');
         let urlImage = options.getString('url_img');
+        let menciones = options.getString('menciones');
+        let mencionesValidas = "";
 
         if(titulo == undefined && descripcion == undefined){
             await interaction.reply({content : 'Requiere informar minimo un título o descripción.', ephemeral: true});
@@ -53,10 +62,17 @@ module.exports = {
             embed.author.name = interaction.user.username;
             embed.author.icon_url = interaction.user.displayAvatarURL();
 
+            if(menciones){
+                const mencionesList = menciones.split(/ +/);
+
+                mencionesValidas = await obtenerListaMenciones(client, mencionesList, interaction.guildId);
+            }
+
             if(utils.isImage(urlImage)) embed.image = { url: urlImage};
             if(utils.isUrl(urlTitle)) embed.url = urlTitle;
-    
-            await interaction.reply({embeds: [embed]});
+            if(mencionesValidas != "") await interaction.reply({embeds: [embed], content: mencionesValidas});
+            else await interaction.reply({embeds: [embed]});
+            
         }
 	},
 	async reactionAdd(reaction, user){
@@ -84,4 +100,33 @@ function initEmbed(){
         }
     }
     return embed;
+}
+
+async function obtenerListaMenciones(client, mencionesList, guildId){
+    let mencionesValidas = "";
+
+    for(let i = 0; i < mencionesList.length; i++){
+        if(mencionesList[i].includes('@')){
+            if(mencionesList[i] === '@everyone'){
+                mencionesValidas = mencionesValidas === "" ?  mencionesList[i] : mencionesValidas + " " + mencionesList[i];
+            }else{
+                let mencionId = mencionesList[i].replace(/[^0-9 ]/g, "").trim();
+
+                if(mencionId === "") continue;
+
+                let rol = await utils.findRol(client, guildId, mencionId);
+                let member = await client.users.fetch(mencionId).catch(err => log.debug('No se encuentra el usuario ' + mencionId));
+
+                if(rol){
+                    mencionesValidas = mencionesValidas === "" ?  mencionesList[i] : mencionesValidas + " " + mencionesList[i];
+                }
+                
+                if(member){
+                    mencionesValidas = mencionesValidas === "" ?  mencionesList[i] : mencionesValidas + " " + mencionesList[i];
+                }
+            }
+        }
+    }
+
+    return mencionesValidas;
 }

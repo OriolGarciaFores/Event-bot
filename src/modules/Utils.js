@@ -61,5 +61,12 @@ function progressBar (value, maxValue, size) {
     return member.permissions.has(['MANAGE_MESSAGES']);
   }
 
+  async function findRol(client, guildId, rolId){
+    const guild = await client.guilds.fetch(guildId);
+    let role = await guild.roles.cache.find(r => r.id === rolId);
 
-module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError, isImage, isUrl, validateMemberPermissionEdit}
+    return role;
+  }
+
+
+module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError, isImage, isUrl, validateMemberPermissionEdit, findRol}
