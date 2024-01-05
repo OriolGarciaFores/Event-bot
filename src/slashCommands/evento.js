@@ -3,7 +3,7 @@ const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
 const utils = require('../modules/Utils.js');
 const log = require('../modules/logger');
-const serviceGuild = require('../dataBase/services/serviceGuild');
+//const serviceGuild = require('../dataBase/services/serviceGuild');
 
 module.exports = {
 	slash : {
@@ -64,7 +64,7 @@ module.exports = {
 		msg.react(CONSTANTS.EDIT_REACT);
         msg.react(CONSTANTS.DELETE_REACT);
 
-		guardarCache(msg);
+		//guardarCache(msg);
 
 		log.info('Se ha generado un /evento.');
 	},

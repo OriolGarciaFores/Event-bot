@@ -4,7 +4,7 @@ const EMOJI = require('../constants/emojis.js');
 const CONSTANTS = require('../constants/constants.js');
 const LITERAL = require('../constants/literals.js');
 const log = require('../modules/logger');
-const serviceGuild = require('../dataBase/services/serviceGuild');
+//const serviceGuild = require('../dataBase/services/serviceGuild');
 
 const RESPUESTAS_REACTIONS = [EMOJI.A, EMOJI.B, EMOJI.C, EMOJI.D, EMOJI.E];
 const MAX_SIZE_BAR = 20;
@@ -90,7 +90,7 @@ module.exports = {
 
         msg.react(CONSTANTS.DELETE_REACT);
 
-		guardarCache(msg);
+		//guardarCache(msg);
 		log.info('Se ha generado un /vote.');
 	},
 	async reactionAdd(reaction, user) {
