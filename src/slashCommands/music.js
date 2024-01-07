@@ -4,23 +4,12 @@ const fs = require('fs');
 const { createAudioPlayer, createAudioResource, AudioPlayerStatus, joinVoiceChannel } = require('@discordjs/voice');
 const { Collection } = require('discord.js');
 
-//const player = createAudioPlayer();
-//player.colaSongs = new Collection();
 const queue = new Map();
 
 const SUB_COMMAND_PLAY_SONG = 'play-song';
 const SUB_COMMAND_PLAY_LIST = 'playlist';
-
-const embedUserNotChannel = {
-	color: COLOR.RED,
-	title: 'ATENCIÓN!',
-	description: 'No estas conectado a un canal de voz.'
-};
-
-const embedFinishPlayList = {
-	color: COLOR.GREEN,
-	title: 'Se ha terminado la playlist!'
-};
+const SUB_COMMAND_EXIT = 'exit';
+const SUB_COMMAND_SKIP = 'skip';
 
 module.exports = {
 	slash: {
@@ -64,16 +53,48 @@ module.exports = {
 				]
 
 
+			},
+			{
+				name: SUB_COMMAND_SKIP,
+				description: 'Retirar canción actual.',
+				type: constant.SLASH_TYPE_SUB_COMMAND
+			},
+			{
+				name: SUB_COMMAND_EXIT,
+				description: 'Desconecta del canal de voz.',
+				type: constant.SLASH_TYPE_SUB_COMMAND
 			}
 		]
 	},
 	reactions: false,
 	async execute(interaction, options, client) {
-		if (!interaction.member.voice.channelId) return await interaction.reply({ embeds: [embedUserNotChannel], ephemeral: true });
+		if (!interaction.member.voice.channelId) {
+			const embedUserNotChannel = {
+				color: COLOR.RED,
+				title: 'ATENCIÓN!',
+				description: 'No estas conectado a un canal de voz.'
+			};
+
+			return await interaction.reply({ embeds: [embedUserNotChannel], ephemeral: true });
+		}
 
 		const serverQueue = queue.get(interaction.guildId);
 		const songs = [];
 		let embed = initEmbed();
+
+		if (options.getSubcommand() === SUB_COMMAND_EXIT) {
+			exit(serverQueue, interaction.guildId);
+			embed.title = '';
+			embed.description = 'El bot ha sido desconectado del canal.'
+			return await interaction.reply({ embeds: [embed] });
+		}
+
+		if (options.getSubcommand() === SUB_COMMAND_SKIP) {
+			skip(serverQueue);
+			embed.title = '';
+			embed.description = 'Se ha retirado la canción actual.';
+			return await interaction.reply({ embeds: [embed] });
+		}
 
 		if (options.getSubcommand() === SUB_COMMAND_PLAY_LIST) {
 			let opcion = options.getInteger('option');
@@ -82,12 +103,13 @@ module.exports = {
 				fs.readdirSync('./src/music').forEach(file => {
 					let song = {
 						title: file,
-						url: `./src/music/${file}`
+						url: `./src/music/${file}`,
+						skip: false
 					};
-	
+
 					songs.push(song);
 				});
-	
+
 				embed.title = 'Se ha añadido la playlist a la cola';
 			} else {
 				embed.title = 'Playlist';
@@ -101,10 +123,8 @@ module.exports = {
 					i++;
 				});
 
-				console.log(playlist);
-
 				let field = {
-					name : playlist,
+					name: playlist,
 					value: '\u200b'
 				}
 
@@ -120,7 +140,8 @@ module.exports = {
 			fs.readdirSync('./src/music').forEach(file => {
 				let song = {
 					title: file,
-					url: `./src/music/${file}`
+					url: `./src/music/${file}`,
+					skip: false
 				};
 				listaSongs.set(i, song);
 				i++;
@@ -136,11 +157,12 @@ module.exports = {
 		}
 
 		if (!serverQueue) {
+			const player = createAudioPlayer();
 			const queueContruct = {
 				voiceChannel: interaction.member.voice.channelId,
 				connection: null,
 				songs: [],
-				playing: true
+				player: player
 			};
 
 			queue.set(interaction.guildId, queueContruct);
@@ -148,7 +170,7 @@ module.exports = {
 			songs.forEach(song => {
 				queueContruct.songs.push(song);
 			});
-			
+
 			try {
 				var connection = joinVoiceChannel({
 					channelId: interaction.member.voice.channelId,
@@ -176,7 +198,7 @@ module.exports = {
 	}
 };
 
-function initEmbed(){
+function initEmbed() {
 	let embed = {
 		color: COLOR.GREEN,
 		title: 'Canción añadida a la cola!'
@@ -185,25 +207,47 @@ function initEmbed(){
 	return embed;
 }
 
-
-
 function play(guildId, song, channel) {
 	const serverQueue = queue.get(guildId);
 
 	if (!song) {
-		serverQueue.connection.destroy();
-		queue.delete(guildId);
-		return channel.send({ embeds : [embedFinishPlayList] });
+		exit(serverQueue, guildId);
+
+		const embedFinishPlayList = {
+			color: COLOR.GREEN,
+			title: 'Se ha terminado la playlist!'
+		};
+
+		return channel.send({ embeds: [embedFinishPlayList] });
 	}
 
-	const player = createAudioPlayer();
+	const embedPlaying = {
+		color: COLOR.GREEN,
+		description: 'Está sonando ' + song.title
+	}
 	const resource = createAudioResource(song.url);
 
-	serverQueue.connection.subscribe(player);
-	player.play(resource);
+	serverQueue.player = createAudioPlayer();
+	serverQueue.connection.subscribe(serverQueue.player);
+	serverQueue.player.play(resource);
+	channel.send({ embeds: [embedPlaying] });
 
-	player.on(AudioPlayerStatus.Idle, () => {
+	serverQueue.player.on(AudioPlayerStatus.Idle, () => {
 		serverQueue.songs.shift();
 		play(guildId, serverQueue.songs[0], channel);
 	});
+}
+
+function skip(serverQueue) {
+	if (serverQueue) {
+		serverQueue.player.stop();
+	}
+}
+
+function exit(serverQueue, guildId) {
+	if (serverQueue) {
+		serverQueue.player.stop();
+		serverQueue.connection.destroy();
+		queue.delete(guildId);
+	}
 }
