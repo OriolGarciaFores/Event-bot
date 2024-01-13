@@ -1,8 +1,9 @@
 const constant = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
 const fs = require('fs');
-const { createAudioPlayer, createAudioResource, AudioPlayerStatus, joinVoiceChannel } = require('@discordjs/voice');
-const { Collection } = require('discord.js');
+const path = require('path');
+const { createAudioPlayer, createAudioResource, AudioPlayerStatus, joinVoiceChannel, StreamType, demuxProbe } = require('@discordjs/voice');
+const colors = require('../constants/colors.js');
 
 const queue = new Map();
 
@@ -101,26 +102,29 @@ module.exports = {
 
 			if (opcion == 1) {
 				fs.readdirSync('./src/music').forEach(file => {
-					let song = {
-						title: file,
-						url: `./src/music/${file}`,
-						skip: false
-					};
-
-					songs.push(song);
+					if (path.extname(file).toLowerCase() === '.ogg') {
+						let song = {
+							title: file,
+							url: `./src/music/${file}`
+						};
+	
+						songs.push(song);
+					}
 				});
 
 				embed.title = 'Se ha añadido la playlist a la cola';
 			} else {
 				embed.title = 'Playlist';
 				embed.fields = [];
-				let i = 0;
+				let i = 1;
 				let playlist = '';
 
 				fs.readdirSync('./src/music').forEach(file => {
-					let song = i + ' - ' + file + ' \n';
-					playlist = playlist + song;
-					i++;
+					if (path.extname(file).toLowerCase() === '.ogg') {
+						let song = i + ' - ' + file + ' \n';
+						playlist = playlist + song;
+						i++;
+					}
 				});
 
 				let field = {
@@ -134,26 +138,30 @@ module.exports = {
 			}
 		} else {
 			let songId = options.getInteger('song_id');
-			let listaSongs = new Map();
-			let i = 0;
+			let i = 1;
+			let song = null;
 
 			fs.readdirSync('./src/music').forEach(file => {
-				let song = {
-					title: file,
-					url: `./src/music/${file}`,
-					skip: false
-				};
-				listaSongs.set(i, song);
-				i++;
+				if (path.extname(file).toLowerCase() === '.ogg') {
+					if (i === songId) {
+						song = {
+							title: file,
+							url: `./src/music/${file}`
+						};
+					}
+					i++;
+				}
 			});
 
-			let song = {
-				title: listaSongs.get(songId).title,
-				url: listaSongs.get(songId).url
-			};
-
-			embed.description = song.title;
-			songs.push(song);
+			if (song) {
+				embed.description = song.title;
+				songs.push(song);
+			} else {
+				embed.title = '';
+				embed.description = 'La música no existe en la playlist.';
+				embed.color = colors.RED;
+				return await interaction.reply({ embeds: [embed], ephemeral: true });
+			}
 		}
 
 		if (!serverQueue) {
@@ -209,7 +217,7 @@ function initEmbed() {
 
 function play(guildId, song, channel) {
 	const serverQueue = queue.get(guildId);
-	console.log(serverQueue.songs.length);
+
 	if (!song) {
 		exit(serverQueue, guildId);
 
@@ -229,8 +237,11 @@ function play(guildId, song, channel) {
 	serverQueue.player = null;
 	serverQueue.player = createAudioPlayer();
 	serverQueue.connection.subscribe(serverQueue.player);
+	const stream = fs.createReadStream(song.url);
+    const resource = createAudioResource(stream, {
+		inputType: StreamType.OggOpus
+	});
 
-	const resource = createAudioResource(song.url);
 	serverQueue.player.play(resource);
 
 	channel.send({ embeds: [embedPlaying] });
@@ -255,8 +266,10 @@ function exit(serverQueue, guildId) {
 	if (serverQueue) {
 		serverQueue.player.removeAllListeners();
 		serverQueue.player.stop();
-		serverQueue.player = null;
 		serverQueue.connection.destroy();
+		serverQueue.songs = [];
+		serverQueue.connection = null;
+  		serverQueue.player = null;
 		queue.delete(guildId);
 	}
 }
