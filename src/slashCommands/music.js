@@ -193,8 +193,6 @@ module.exports = {
 				serverQueue.songs.push(song);
 			});
 
-			console.log(serverQueue.songs);
-
 			return await interaction.reply({ embeds: [embed], ephemeral: true });
 		}
 	}
