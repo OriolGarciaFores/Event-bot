@@ -193,6 +193,8 @@ module.exports = {
 				serverQueue.songs.push(song);
 			});
 
+			console.log(serverQueue.songs);
+
 			return await interaction.reply({ embeds: [embed], ephemeral: true });
 		}
 	}
@@ -209,7 +211,7 @@ function initEmbed() {
 
 function play(guildId, song, channel) {
 	const serverQueue = queue.get(guildId);
-
+	console.log(serverQueue.songs.length);
 	if (!song) {
 		exit(serverQueue, guildId);
 
@@ -225,17 +227,24 @@ function play(guildId, song, channel) {
 		color: COLOR.GREEN,
 		description: 'Está sonando ' + song.title
 	}
-	const resource = createAudioResource(song.url);
 
+	serverQueue.player = null;
 	serverQueue.player = createAudioPlayer();
 	serverQueue.connection.subscribe(serverQueue.player);
+
+	const resource = createAudioResource(song.url);
 	serverQueue.player.play(resource);
+
 	channel.send({ embeds: [embedPlaying] });
 
-	serverQueue.player.on(AudioPlayerStatus.Idle, () => {
-		serverQueue.songs.shift();
-		play(guildId, serverQueue.songs[0], channel);
-	});
+	serverQueue.player.removeAllListeners();
+	serverQueue.player.on(AudioPlayerStatus.Idle, () => nextSong(serverQueue, guildId, channel));
+}
+
+function nextSong(serverQueue, guildId, channel) {
+	serverQueue.songs.shift();
+	serverQueue.player.removeAllListeners();
+	play(guildId, serverQueue.songs[0], channel);
 }
 
 function skip(serverQueue) {
@@ -246,7 +255,9 @@ function skip(serverQueue) {
 
 function exit(serverQueue, guildId) {
 	if (serverQueue) {
+		serverQueue.player.removeAllListeners();
 		serverQueue.player.stop();
+		serverQueue.player = null;
 		serverQueue.connection.destroy();
 		queue.delete(guildId);
 	}
