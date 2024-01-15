@@ -115,7 +115,7 @@ module.exports = {
 				embed.title = 'Se ha añadido la playlist a la cola';
 			} else {
 				embed.title = 'Playlist';
-				embed.fields = [];
+				//embed.fields = [];
 				let i = 1;
 				let playlist = '';
 
@@ -127,14 +127,40 @@ module.exports = {
 					}
 				});
 
-				let field = {
-					name: playlist,
-					value: '\u200b'
+				if (playlist.length > 4096) {
+					const lista = playlist.split('\n');
+					playlist = '';
+
+					const MAX_DIVISION = 25;
+					const TOTAL_BLOQUES = Math.ceil(lista.length / MAX_DIVISION);
+
+					for (let i = 0; i < TOTAL_BLOQUES; i++) {
+						let inicio = i * MAX_DIVISION;
+						let fin = inicio + MAX_DIVISION;
+						let registros = lista.slice(inicio, fin);
+
+						for (let h = 0; h < registros.length; h++) {
+							let song = registros[h] + ' \n';
+							playlist = playlist + song;
+						}
+
+						if (i === 0) {
+							embed.description = playlist;
+							await interaction.reply({ embeds: [embed] });
+						} else {
+							embed.description = playlist;
+							await interaction.channel.send({ embeds: [embed] });
+						}
+
+						embed.description = '';
+						playlist = '';
+					}
+
+					return;
+				} else {
+					embed.description = playlist;
+					return await interaction.channel.send({ embeds: [embed] });
 				}
-
-				embed.fields.push(field);
-
-				return await interaction.reply({ embeds: [embed] });
 			}
 		} else {
 			let songId = options.getInteger('song_id');
