@@ -18,7 +18,7 @@ module.exports = {
         sucessEnable: process.env.LOG_SUCCESS
     },
     status: {
-        version: '1.5.2',
+        version: '1.6.0-SNAPSHOT',
         description: '/help | Version: ',
         type: 'PLAYING'
     }
