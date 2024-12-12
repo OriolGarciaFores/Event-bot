@@ -6,7 +6,7 @@ const config = require('../config');
 const log = require('./modules/logger');
 //const serviceGuild = require('./dataBase/services/serviceGuild');
 
-require("./deploySlashCommands.js");
+const {slashDisabled} = require("./deploySlashCommands.js");
 require("dotenv").config();
 
 const client = new Client({
@@ -41,10 +41,14 @@ const init = async () => {
 	for (const file of slashCommandFiles) {
 		const moduleSlash = require(`./slashCommands/${file}`);
 		const slash = moduleSlash.slash;
-	
-		log.info(`Loading... SlashCommand: ${file}`);
-		client.slashCommands.set(slash.name, moduleSlash);
-		log.correct(`Loaded /${slash.name} OK`);
+
+		if (slashDisabled.indexOf(slash.name) > -1) {
+			log.warn(`Disabled SlashCommand: ${file}`);
+		} else {
+			log.info(`Loading... SlashCommand: ${file}`);
+			client.slashCommands.set(slash.name, moduleSlash);
+			log.correct(`Loaded /${slash.name} OK`);
+		}
 	}
 
 	client.login(config.token);

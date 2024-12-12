@@ -3,6 +3,11 @@ const { Routes } = require('discord-api-types/v9');
 const fs = require('fs');
 
 const log = require('./modules/logger');
+const slashDisabled = ["music"];
+
+module.exports = {
+	slashDisabled
+}
 
 require("dotenv").config();
 
@@ -11,7 +16,11 @@ const commandFiles = fs.readdirSync('./src/slashCommands').filter(file => file.e
 
 for (const file of commandFiles) {
 	const command = require(`./slashCommands/${file}`);
-	commands.push(command.slash);
+
+	if (slashDisabled.indexOf(command.slash.name) != 0) { 
+		commands.push(command.slash);
+		log.info(`Slash deployed: ${command.slash.name}`);
+	}
 }
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
