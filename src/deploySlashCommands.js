@@ -3,7 +3,7 @@ const { Routes } = require('discord-api-types/v9');
 const fs = require('fs');
 
 const log = require('./modules/logger');
-const slashDisabled = ["music"];
+const slashDisabled = [];
 
 module.exports = {
 	slashDisabled
