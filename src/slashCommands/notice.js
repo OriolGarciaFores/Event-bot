@@ -2,6 +2,7 @@ const color = require('../constants/colors.js');
 const constant = require('../constants/constants.js');
 const utils = require('../modules/Utils.js');
 const log = require('../modules/logger');
+const { MessageFlags, EmbedBuilder } = require('discord.js');
 
 module.exports = {
 	slash : {
@@ -52,7 +53,7 @@ module.exports = {
         let mencionesValidas = "";
 
         if(titulo == undefined && descripcion == undefined){
-            await interaction.reply({content : 'Requiere informar minimo un título o descripción.', ephemeral: true});
+            await interaction.reply({content : 'Requiere informar minimo un título o descripción.', flags: MessageFlags.Ephemeral});
         }else{
             if(descripcion != undefined) 
                 descripcion = descripcion.replaceAll('\\n', '\n');
@@ -76,9 +77,9 @@ module.exports = {
         }
 	},
 	async reactionAdd(reaction, user){
-        let embed = reaction.message.embeds[0];
+        let embed = EmbedBuilder.from(reaction.message.embeds[0]);
 		let userId = user.username;
-		let creadorEmber = embed.author.name;
+		let creadorEmber = embed.data.author.name;
         let emoji = reaction.emoji.name;
 
         if (emoji === constant.DELETE_REACT){

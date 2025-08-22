@@ -3,7 +3,7 @@ const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
 const utils = require('../modules/Utils.js');
 const log = require('../modules/logger');
-const { EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, MessageFlags } = require('discord.js');
 
 module.exports = {
 	slash : {
@@ -148,7 +148,7 @@ module.exports = {
 		}
 	},
 	async reactionRemove(reaction, user){
-		var embed = EmbedBuilder.from(reaction.message.embeds[0])
+		var embed = EmbedBuilder.from(reaction.message.embeds[0]);
 		var fields = embed.data.fields;
 
 		switch (reaction.emoji.name) {
@@ -181,7 +181,7 @@ module.exports = {
 			embedInfo.color = COLOR.RED;
 			embedInfo.description = 'No tienes permisos para editar.';
 			log.debug('Usuario sin permiso de edición.');
-			await interaction.reply({embeds: [embedInfo], ephemeral: true });
+			await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral });
 		}else{
 			switch (campoId) {
 				case '1':
@@ -202,11 +202,11 @@ module.exports = {
 					embed.data.color = COLOR.RED;
 					embed.data.description = 'CAMPO_ID incorrecto.';
 	
-					return await interaction.reply({embeds: [embedInfo], ephemeral: true});
+					return await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral});
 			}
 	
 			await message.edit({embeds: [embed]});
-			await interaction.reply({embeds: [embedInfo], ephemeral: true });
+			await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral });
 			log.info('Se ha modificado un bloque de texto bot.');
 		}
 	},
@@ -254,11 +254,11 @@ module.exports = {
 			fields = calcularParticipantes(fields);
 			
 			await message.edit({ embeds: [embed] });
-			await interaction.reply({embeds: [embedInfo], ephemeral: true});
+			await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral});
 		}else{
 			embedInfo.color = COLOR.RED;
 			embedInfo.description = 'Usuario ' + nombreUsuario + ' ya está apuntado!';
-			await interaction.reply({embeds: [embedInfo], ephemeral: true});
+			await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral});
 		}
 	},
 	async removeUserCustom(message, interaction, nombreUsuario){
@@ -276,7 +276,7 @@ module.exports = {
 		fields = calcularParticipantes(fields);
 
 		await message.edit({ embeds: [embed] });
-		await interaction.reply({embeds: [embedInfo], ephemeral: true});
+		await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral});
 	}
 };
 

@@ -4,7 +4,7 @@ const EMOJI = require('../constants/emojis.js');
 const CONSTANTS = require('../constants/constants.js');
 const LITERAL = require('../constants/literals.js');
 const log = require('../modules/logger');
-//const serviceGuild = require('../dataBase/services/serviceGuild');
+const { MessageFlags, EmbedBuilder } = require('discord.js');
 
 const RESPUESTAS_REACTIONS = [EMOJI.A, EMOJI.B, EMOJI.C, EMOJI.D, EMOJI.E];
 const MAX_SIZE_BAR = 20;
@@ -82,23 +82,24 @@ module.exports = {
         embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;
 		embed.timestamp = new Date();
 
-        const msg = await interaction.reply({ embeds: [embed], fetchReply: true });
+        await interaction.reply({ embeds: [embed] });
+
+		const msg = await interaction.fetchReply();
 
         for (let i = 0; i < respuestas.length; i++) {
-            msg.react(RESPUESTAS_REACTIONS[i]);
+           await msg.react(RESPUESTAS_REACTIONS[i]);
         }
 
         msg.react(CONSTANTS.DELETE_REACT);
 
-		//guardarCache(msg);
 		log.info('Se ha generado un /vote.');
 	},
 	async reactionAdd(reaction, user) {
 		const OPERATION = '+';
-		var embed = reaction.message.embeds[0];
-		let fields = embed.fields;
+		var embed = EmbedBuilder.from(reaction.message.embeds[0]);
+		let fields = embed.data.fields;
 		var userId = user.username + '#' + user.discriminator;
-		var creadorEmber = embed.footer.text.split(LITERAL.FOOTER_TEXT)[1];
+		var creadorEmber = embed.data.footer.text.split(LITERAL.FOOTER_TEXT)[1];
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
 		let totalVotos = 0;
@@ -122,19 +123,17 @@ module.exports = {
 
 			totalVotos++;
 
-			updateFields(fields, position, totalVotos, OPERATION)
-
-			embed.setFields(fields);
+			updateFields(fields, position, totalVotos, OPERATION);
 
 			await reaction.message.edit({ embeds: [embed] });
 		}
 	},
 	async reactionRemove(reaction, user) {
 		const OPERATION = '-';
-		var embed = reaction.message.embeds[0];
+		var embed = EmbedBuilder.from(reaction.message.embeds[0]);
 		let emoji = reaction.emoji.name;
 		let totalVotos = 0;
-		let fields = embed.fields;
+		let fields = embed.data.fields;
 		let position = 0;
 
 		if (emoji === CONSTANTS.DELETE_REACT || !validarRespuestas(fields.length, emoji)) return;
@@ -147,9 +146,7 @@ module.exports = {
 
 		totalVotos--;
 
-		updateFields(fields, position, totalVotos, OPERATION)
-
-		embed.setFields(fields);
+		updateFields(fields, position, totalVotos, OPERATION);
 
 		await reaction.message.edit({ embeds: [embed] });
 	}

@@ -1,6 +1,6 @@
 const constant = require('../constants/constants.js');
-const utils = require('../modules/Utils.js');
 const log = require('../modules/logger');
+const { MessageFlags } = require('discord.js');
 
 module.exports = {
     slash : {
@@ -37,7 +37,7 @@ module.exports = {
         const command = client.slashCommands.get(message.interaction.commandName);
 
         if (!command || !command.editable) {
-            await interaction.reply({content: 'No se puede modificar.', fetchReply: true, ephemeral: true });
+            await interaction.reply({content: 'No se puede modificar.', fetchReply: true, flags: MessageFlags.Ephemeral });
             log.warn('No se ha podido modificar un bloque de texto bot.');
         }else{
             await command.edit(interaction, message, campoId, contenido);
