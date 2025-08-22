@@ -1,4 +1,4 @@
-const { Client, Intents, Collection, GatewayIntentBits, ActivityType } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = require('discord.js');
 const fs = require('fs');
 const config = require('../config');
 const log = require('./modules/logger');
@@ -7,9 +7,18 @@ const {slashDisabled} = require("./deploySlashCommands.js");
 require("dotenv").config();
 
 const client = new Client({
-	 intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers],
-	 partials: ['REACTION', 'MESSAGE'] 
-	});
+	 intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMessageReactions,
+		GatewayIntentBits.GuildMembers
+		],
+	 partials: [
+		Partials.Reaction, 
+		Partials.Message,
+		Partials.Reaction
+	] 
+});
 
 const embedError = {
 	color: 0xff0000,
@@ -148,12 +157,9 @@ async function messageReaction(type, reaction, user){
 
 async function reactions(type, message, reaction, user) {
 	try {
-		if(!message.author.bot || message.author.id !== client.user.id) return;
+		if(user.bot) return;
 
-		let command;
-
-		if (message.interaction !== null && message.interaction.type === 'APPLICATION_COMMAND')
-			command = client.slashCommands.get(message.interaction.commandName);
+		let command = client.slashCommands.get(message.interaction.commandName);
 
 		if (!command || !command.reactions) return;
 
