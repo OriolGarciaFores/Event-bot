@@ -157,7 +157,8 @@ async function messageReaction(type, reaction, user){
 
 async function reactions(type, message, reaction, user) {
 	try {
-		if(user.bot) return;
+		if (!message.author || message.author.id !== client.user.id) return;
+		if (!message.interaction || message.interaction.type !== 2) return;
 
 		let command = client.slashCommands.get(message.interaction.commandName);
 
