@@ -1,16 +1,13 @@
-const { Client, Intents, Collection } = require('discord.js');
+const { Client, Intents, Collection, GatewayIntentBits, ActivityType } = require('discord.js');
 const fs = require('fs');
-//const mongoose = require('mongoose');
-const { prefix } = require('../config.json'); //DEPRECATED
 const config = require('../config');
 const log = require('./modules/logger');
-//const serviceGuild = require('./dataBase/services/serviceGuild');
 
 const {slashDisabled} = require("./deploySlashCommands.js");
 require("dotenv").config();
 
 const client = new Client({
-	 intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS, Intents.FLAGS.GUILD_VOICE_STATES],
+	 intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMembers],
 	 partials: ['REACTION', 'MESSAGE'] 
 	});
 
@@ -32,7 +29,6 @@ const embedWelcome = {
 const TYPE_REACTION_ADD = 'messageReactionAdd';
 const TYPE_REACTION_REMOVE = 'messageReactionRemove';
 
-client.commands = new Collection();//DEPRECATED
 client.slashCommands = new Collection();
 
 const init = async () => {
@@ -52,24 +48,13 @@ const init = async () => {
 	}
 
 	client.login(config.token);
-	
-	/*mongoose.connect(config.mongoDB, {
-		useNewUrlParser: true,
-		useUnifiedTopology: true
-	}).then(() => {
-		log.correct('Connected to MongoDB')
-	}).catch((err) => {
-		log.error('Unable to connect to MongoDB Database.\nError: ' + err)
-	});*/
 }
 
 init();
 
-client.once("ready", () => {
+client.once("clientReady", () => {
 	log.info("INICIADO");
-	client.user.setActivity(config.status.description + config.status.version, { type: config.status.type });
-
-	//loadCache();
+	client.user.setActivity(config.status.description + config.status.version, { type: ActivityType.Playing });
 });
 
 client.on('interactionCreate', async interaction => {

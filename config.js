@@ -5,7 +5,6 @@ require("dotenv").config();
 module.exports = {
     token: process.env.TOKEN,
     clientId: process.env.CLIENT_ID,
-    mongoDB: process.env.MONGO_DB,
     owner: {
         id: process.env.ID_OWNER,
         name: 'Tebrase'
@@ -19,7 +18,6 @@ module.exports = {
     },
     status: {
         version: '1.6.0-SNAPSHOT',
-        description: '/help | Version: ',
-        type: 'PLAYING'
+        description: '/help | Version: '
     }
 }
