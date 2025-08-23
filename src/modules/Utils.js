@@ -68,5 +68,10 @@ function progressBar (value, maxValue, size) {
     return role;
   }
 
+  function getBooleanSiNo(siNo) {
+    if (siNo === 'S') return true;
+    return false;
+  }
 
-module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError, isImage, isUrl, validateMemberPermissionEdit, findRol}
+
+module.exports = {progressBar, textNegrita, getOldReactionByUser, generarMensajeError, isImage, isUrl, validateMemberPermissionEdit, findRol, getBooleanSiNo}

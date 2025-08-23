@@ -30,6 +30,22 @@ module.exports = {
                 required : true
             },
 			{
+				name: "crear_hilo",
+				description: "¿Quieres crear un hilo?",
+				type: CONSTANTS.SLASH_OPTION_TYPE_STRING,
+				required: true,
+				choices: [
+					{
+						name: 'Si',
+						value: 'S'
+					},
+					{
+						name: 'No',
+						value: 'N'
+					}
+				]
+			},
+			{
 				name : "url_img",
 				description : "URL para añadir una imagen al evento.",
 				type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
@@ -44,6 +60,7 @@ module.exports = {
 		let titulo = options.getString('titulo');
         let descripcion = options.getString('description');
         let horario = options.getString('horario');
+		const permisoCrearHilo = utils.getBooleanSiNo(options.getString('crear_hilo'));
 		let urlImage = options.getString('url_img');
 
 		descripcion = descripcion.replaceAll('\\n', '\n');
@@ -59,6 +76,13 @@ module.exports = {
         await interaction.reply({embeds: [embed]});
 
 		const msg = await interaction.fetchReply();
+
+		if (permisoCrearHilo) {
+			await msg.startThread({
+				name: titulo,
+				reason: 'Hilo para tratar del evento'
+			});
+		}
 
         await msg.react(CONSTANTS.TANK);
         await msg.react(CONSTANTS.DPS);
@@ -77,9 +101,13 @@ module.exports = {
 		let emoji = reaction.emoji.name;
 		let member = await reaction.message.guild.members.fetch(user.id);
 
-		if (emoji === CONSTANTS.DELETE_REACT){
-			if(userId === creadorEmber) reaction.message.delete();
-			else reaction.message.reactions.resolve(emoji).users.remove(user.id);
+		if (emoji === CONSTANTS.DELETE_REACT) {
+			if (userId === creadorEmber) {
+				deleteThreadChannel(reaction.message);
+				reaction.message.delete();
+			} else {
+				reaction.message.reactions.resolve(emoji).users.remove(user.id);
+			}
 		}
 
 		if(emoji === CONSTANTS.EDIT_REACT){
@@ -402,4 +430,22 @@ function retirarUserField(fields, username, nameField) {
 	}
 
 	return fields;
+}
+
+async function deleteThreadChannel(message) {
+	try {
+    let threadsActives = await message.channel.threads.fetchActive();
+    let thread = threadsActives.threads.get(message.id);
+
+    if (!thread) {
+      const threadsArchived = await message.channel.threads.fetchArchived();
+      thread = threadsArchived.threads.get(message.id);
+    }
+
+    if (thread) {
+      await thread.delete();
+    }
+  } catch (err) {
+    log.error('Error al borrar hilo:', err);
+  }
 }
