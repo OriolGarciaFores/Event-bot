@@ -2,6 +2,7 @@ const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = requir
 const fs = require('fs');
 const config = require('../config');
 const log = require('./modules/logger');
+const guildService = require('./services/guildService');
 
 const {slashDisabled} = require("./deploySlashCommands.js");
 require("dotenv").config();
@@ -64,6 +65,7 @@ init();
 client.once("clientReady", () => {
 	log.info("INICIADO");
 	client.user.setActivity(config.status.description + config.status.version, { type: ActivityType.Playing });
+	guildService.initializeGuilds(client.guilds.cache);
 });
 
 client.on('interactionCreate', async interaction => {

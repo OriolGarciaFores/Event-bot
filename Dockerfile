@@ -4,6 +4,9 @@ FROM node:24-alpine
 # Directorio del contenedor del app
 WORKDIR /app-altsBot
 
+# Crear carpeta vacía para la DB
+RUN mkdir -p dataBase
+
 # Copiar package.json y package-lock.json primero
 COPY package*.json ./
 
