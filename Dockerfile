@@ -13,8 +13,5 @@ RUN npm install
 # Copiar el resto del proyecto
 COPY . .
 
-# Copiar archivo de ejemplo de variables de entorno como .env
-COPY .env-des .env
-
 # Comando por defecto para iniciar el bot
 CMD ["npm", "start"]
