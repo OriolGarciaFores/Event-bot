@@ -37,3 +37,37 @@ Arranque con:
 ```
 npm start
 ```
+
+## Docker
+
+Para montar la imagen al docker:
+
+```
+docker build -t nombre-imagen .
+```
+En la ruta donde tengas un .env configurador:
+
+```
+docker run -d --name nombre-contenedor --env-file .env nombre-imagen
+```
+
+### Otros comandos docker
+
+Para inspeccionar todas las configuraciones como el Env:
+
+```
+docker inspect nombre-contenedor
+```
+
+Otros comandos:
+
+```
+docker start nombre-contenedor
+
+docker stop nombre-contenedor
+
+docker ps
+
+docker ps -a
+```
+
