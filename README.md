@@ -50,6 +50,11 @@ En la ruta donde tengas un .env configurador:
 ```
 docker run -d --name nombre-contenedor --env-file .env nombre-imagen
 ```
+Si quieres que acceda a una carpeta externa como una base de datos local sqlite:
+
+```
+docker run -d --name nombre-contenedor --env-file .env -v ./dataBase:/app-altsBot/dataBase nombre-imagen
+```
 
 ### Otros comandos docker
 
