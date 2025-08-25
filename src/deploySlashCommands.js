@@ -25,13 +25,14 @@ for (const file of commandFiles) {
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
-
-//applicationGuildCommands -> Solo para un server especifico, se añade inmediato
-/*rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID_DEV), { body: commands })
-	.then(() => log.correct('Successfully registered application commands.'))
-	.catch(console.error);*/
-
-//applicationCommands -> GLOBAL Tarda 1 hora al añadirse a los servers.
-rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands })
-	.then(() => log.correct('Successfully registered application commands.'))
-	.catch(console.error);
+if (process.env.ENTORNO === 'PRO') {
+	//applicationCommands -> GLOBAL Tarda 1 hora al añadirse a los servers.
+	rest.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands })
+		.then(() => log.correct('Successfully registered application commands.'))
+		.catch(console.error);
+} else {
+	//applicationGuildCommands -> Solo para un server especifico, se añade inmediato
+	rest.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID_DEV), { body: commands })
+		.then(() => log.correct('Successfully registered application commands.'))
+		.catch(console.error);
+}
