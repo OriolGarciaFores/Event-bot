@@ -2,7 +2,7 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const log = require("./modules/logger");
 
-const dbPath = path.join(__dirname, '..', 'database', 'database.db');
+const dbPath = path.join(__dirname, '..', 'dataBase', 'database.db');
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) log.error('Error al conectar a SQLite', err.message);
