@@ -2,24 +2,29 @@ const { version } = require("discord.js");
 
 require("dotenv").config();
 
+function toBool(value) {
+    if (!value) return false;
+    const val = value.toString().toLowerCase();
+    if (val === "true") return true;
+    return false;
+}
+
 module.exports = {
     token: process.env.TOKEN,
     clientId: process.env.CLIENT_ID,
-    mongoDB: process.env.MONGO_DB,
     owner: {
         id: process.env.ID_OWNER,
         name: 'Tebrase'
     },
     logs: {
-        infoEnable: process.env.LOG_INFO,
-        debugEnable: process.env.LOG_DEBUG,
-        errorEnable: process.env.LOG_ERROR,
-        warnEnable: process.env.LOG_WARN,
-        sucessEnable: process.env.LOG_SUCCESS
+        infoEnable: toBool(process.env.LOG_INFO),
+        debugEnable: toBool(process.env.LOG_DEBUG),
+        errorEnable: toBool(process.env.LOG_ERROR),
+        warnEnable: toBool(process.env.LOG_WARN),
+        sucessEnable: toBool(process.env.LOG_SUCCESS)
     },
     status: {
-        version: '1.5.2',
-        description: '/help | Version: ',
-        type: 'PLAYING'
+        version: '1.6.0',
+        description: '/help | Version: '
     }
 }

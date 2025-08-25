@@ -1,5 +1,6 @@
 const constant = require('../constants/constants.js');
 const log = require('../modules/logger');
+const { MessageFlags } = require('discord.js');
 
 module.exports = {
     slash : {
@@ -32,15 +33,14 @@ module.exports = {
         const eventId = options.getString('event_id');
         const nombreUsuario = options.getString('user_name');
         const message = await client.channels.cache.get(interaction.channelId).messages.fetch(eventId);
-        const embed = message.embeds[0];
-        const type = embed.title.toLowerCase().split(' - ')[0];
+        const type = message.interaction.commandName;
         const command = client.slashCommands.get(type);
 
         if(type === 'evento'){
             await command.removeUserCustom(message, interaction, nombreUsuario);
             log.info('Se ha retirado un usuario de un evento. Usuario retirado: ' + nombreUsuario);
         }else{
-            await interaction.reply({constent: 'Error, no es posible retirar el usuario en este tipo de evento.', ephemeral: true});
+            await interaction.reply({constent: 'Error, no es posible retirar el usuario en este tipo de evento.', flags: MessageFlags.Ephemeral});
             log.error('Error, no es posible retirar el usuario en este tipo de evento.');
         }
 

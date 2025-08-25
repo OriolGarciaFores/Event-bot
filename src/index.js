@@ -1,18 +1,24 @@
-const { Client, Intents, Collection } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = require('discord.js');
 const fs = require('fs');
-const mongoose = require('mongoose');
-const { prefix } = require('../config.json'); //DEPRECATED
 const config = require('../config');
 const log = require('./modules/logger');
-const serviceGuild = require('./dataBase/services/serviceGuild');
 
-require("./deploySlashCommands.js");
+const {slashDisabled} = require("./deploySlashCommands.js");
 require("dotenv").config();
 
 const client = new Client({
-	 intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS, Intents.FLAGS.GUILD_MEMBERS],
-	 partials: ['REACTION', 'MESSAGE'] 
-	});
+	 intents: [
+		GatewayIntentBits.Guilds,
+		GatewayIntentBits.GuildMessages,
+		GatewayIntentBits.GuildMessageReactions,
+		GatewayIntentBits.GuildMembers
+		],
+	 partials: [
+		Partials.Reaction, 
+		Partials.Message,
+		Partials.Reaction
+	] 
+});
 
 const embedError = {
 	color: 0xff0000,
@@ -32,7 +38,6 @@ const embedWelcome = {
 const TYPE_REACTION_ADD = 'messageReactionAdd';
 const TYPE_REACTION_REMOVE = 'messageReactionRemove';
 
-client.commands = new Collection();//DEPRECATED
 client.slashCommands = new Collection();
 
 const init = async () => {
@@ -41,31 +46,24 @@ const init = async () => {
 	for (const file of slashCommandFiles) {
 		const moduleSlash = require(`./slashCommands/${file}`);
 		const slash = moduleSlash.slash;
-	
-		log.info(`Loading... SlashCommand: ${file}`);
-		client.slashCommands.set(slash.name, moduleSlash);
-		log.correct(`Loaded /${slash.name} OK`);
+
+		if (slashDisabled.indexOf(slash.name) > -1) {
+			log.warn(`Disabled SlashCommand: ${file}`);
+		} else {
+			log.info(`Loading... SlashCommand: ${file}`);
+			client.slashCommands.set(slash.name, moduleSlash);
+			log.correct(`Loaded /${slash.name} OK`);
+		}
 	}
 
 	client.login(config.token);
-	
-	mongoose.connect(config.mongoDB, {
-		useNewUrlParser: true,
-		useUnifiedTopology: true
-	}).then(() => {
-		log.correct('Connected to MongoDB')
-	}).catch((err) => {
-		log.error('Unable to connect to MongoDB Database.\nError: ' + err)
-	});
 }
 
 init();
 
-client.once("ready", () => {
+client.once("clientReady", () => {
 	log.info("INICIADO");
-	client.user.setActivity(config.status.description + config.status.version, { type: config.status.type });
-
-	loadCache();
+	client.user.setActivity(config.status.description + config.status.version, { type: ActivityType.Playing });
 });
 
 client.on('interactionCreate', async interaction => {
@@ -159,12 +157,10 @@ async function messageReaction(type, reaction, user){
 
 async function reactions(type, message, reaction, user) {
 	try {
-		if(!message.author.bot || message.author.id !== client.user.id) return;
+		if (!message.author || message.author.id !== client.user.id) return;
+		if (!message.interaction || message.interaction.type !== 2) return;
 
-		let command;
-
-		if (message.interaction !== null && message.interaction.type === 'APPLICATION_COMMAND')
-			command = client.slashCommands.get(message.interaction.commandName);
+		let command = client.slashCommands.get(message.interaction.commandName);
 
 		if (!command || !command.reactions) return;
 

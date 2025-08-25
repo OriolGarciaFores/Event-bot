@@ -1,5 +1,6 @@
 const COLOR = require('../constants/colors.js');
 const constant = require('../constants/constants.js');
+const { MessageFlags } = require('discord.js');
 
 const embedInfo = {
 	color: COLOR.GREEN,
@@ -37,6 +38,6 @@ module.exports = {
 
         user.send({ embeds: [embedReport] });
 
-        await interaction.reply({embeds: [embedInfo], ephemeral: true});;
+        await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral});;
 	}
 };
