@@ -27,6 +27,8 @@ Necesario fichero variables de entorno .env para arrancar la configuración del 
 TOKEN=codigo_token
 ID_OWNER=usuarioAdminID
 CLIENT_ID=clientId
+GUILD_ID_DEV=idServerDiscord
+ENTORNO=DES
 LOG_INFO=true
 LOG_DEBUG=true
 LOG_ERROR=true
