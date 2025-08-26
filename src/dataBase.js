@@ -1,21 +1,24 @@
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const path = require('path');
 const log = require("./modules/logger");
 
 const dbPath = path.join(__dirname, '..', 'dataBase', 'database.db');
 
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) log.error('Error al conectar a SQLite', err.message);
-  else log.info('Conectado a SQLite');
-});
+let db;
 
-db.serialize(() => {
-  db.run(`
+try {
+  db = new Database(dbPath);
+  log.info('Conectado a SQLite (better-sqlite3)');
+  
+  db.prepare(`
     CREATE TABLE IF NOT EXISTS guild (
       id TEXT PRIMARY KEY,
       name TEXT NOT NULL
     )
-  `);
-});
+  `).run();
+
+} catch (err) {
+  log.error('Error al conectar a SQLite', err.message);
+}
 
 module.exports = db;

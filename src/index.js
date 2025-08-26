@@ -65,7 +65,7 @@ init();
 client.once("clientReady", () => {
 	log.info("INICIADO");
 	client.user.setActivity(config.status.description + config.status.version, { type: ActivityType.Playing });
-	guildService.initializeGuilds(client.guilds.cache);
+	guildService.initializeGuilds(client.guilds.cache.map(g => ({ id: g.id, name: g.name })));
 });
 
 client.on('interactionCreate', async interaction => {
