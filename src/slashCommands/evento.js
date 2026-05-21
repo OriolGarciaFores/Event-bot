@@ -222,7 +222,7 @@ module.exports = {
 					embed.data.fields[0].value = contenido;
 					break;
 				case '4':
-					if(utils.isImage(urlImage)) embed.data.image = { url: contenido};
+					if(utils.isImage(contenido)) embed.data.image = { url: contenido};
 					break;
 				default:
 					log.error('/evento editar -> CAMPO_ID incorrecto.');

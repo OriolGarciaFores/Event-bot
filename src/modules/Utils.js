@@ -50,7 +50,7 @@ function progressBar (value, maxValue, size) {
   }
 
   function isImage(url){
-    return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
+    return /\.(jpg|jpeg|png|webp|avif|gif|svg)(\?.*)?$/i.test(url);
   }
 
   function isUrl(url){
