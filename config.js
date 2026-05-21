@@ -24,7 +24,7 @@ module.exports = {
         sucessEnable: toBool(process.env.LOG_SUCCESS)
     },
     status: {
-        version: '1.6.0',
+        version: '1.6.1',
         description: '/help | Version: '
     }
 }
