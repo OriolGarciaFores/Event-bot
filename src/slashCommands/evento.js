@@ -216,6 +216,7 @@ module.exports = {
 			switch (campoId) {
 				case '1':
 					embed.data.title = contenido;
+					editNameThread(message, embed.data);
 					break;
 				case '2':
 					contenido = contenido.replaceAll('\\n', '\n');
@@ -223,6 +224,7 @@ module.exports = {
 					break;
 				case '3':
 					embed.data.fields[0].value = contenido;
+					editNameThread(message, embed.data);
 					break;
 				case '4':
 					if(utils.isImage(contenido)) embed.data.image = { url: contenido};
@@ -451,4 +453,18 @@ async function deleteThreadChannel(message) {
   } catch (err) {
     log.error('Error al borrar hilo:', err);
   }
+}
+
+async function editNameThread(message, data) {
+	if (message.thread) {
+		try {
+			let titulo = data.title;
+			let horario = data.fields[0].value;
+
+			await message.thread.setName(`${titulo} - ${horario}`);
+		} catch (error) {
+			log.error('No se ha podido renombrar el thread asociado al mensaje');
+			console.error(error);
+		}
+	}
 }
