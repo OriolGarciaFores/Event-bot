@@ -80,7 +80,7 @@ module.exports = {
 
 		if (permisoCrearHilo) {
 			await msg.startThread({
-				name: titulo - horario,
+				name: `${titulo} - ${horario}`,
 				reason: 'Hilo para tratar del evento'
 			});
 		}
