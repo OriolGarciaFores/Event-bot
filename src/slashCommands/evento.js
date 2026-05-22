@@ -102,7 +102,7 @@ module.exports = {
 		let member = await reaction.message.guild.members.fetch(user.id);
 
 		if (emoji === CONSTANTS.DELETE_REACT) {
-			if (userId === creadorEmber) {
+			if (userId === creadorEmber || utils.validateMemberPermissionEdit(member)) {
 				deleteThreadChannel(reaction.message);
 				reaction.message.delete();
 			} else {
