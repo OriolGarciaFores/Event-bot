@@ -17,7 +17,7 @@ const commandFiles = fs.readdirSync('./src/slashCommands').filter(file => file.e
 for (const file of commandFiles) {
 	const command = require(`./slashCommands/${file}`);
 
-	if (slashDisabled.indexOf(command.slash.name) != 0) { 
+	if (!slashDisabled.includes(command.slash.name)) { 
 		commands.push(command.slash);
 		log.info(`Slash deployed: ${command.slash.name}`);
 	}
