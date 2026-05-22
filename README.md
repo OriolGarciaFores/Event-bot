@@ -16,10 +16,12 @@ Discord bot para organizar principalmente eventos de grupos tipicos de los juego
 
 ## Ejecución
 
-Instalación de las dependencias del proyecto con:
+Instalación de las dependencias del proyecto:
 
 ```
-npm install
+npm install -g pnpm@latest-11
+
+pnpm install
 ```
 
 Necesario fichero variables de entorno .env para arrancar la configuración del bot con las siguientes variables:
