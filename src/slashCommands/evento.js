@@ -161,6 +161,8 @@ module.exports = {
 				const tituloEvento = embed.data.title;
 				const image_url = embed.data.image?.url || '\u200B';
 
+				embed.data.description = embed.data.description.replaceAll('\n', '\\n');
+
 				embedInfo.description = 'Ejecuta el comando /edit con el campo messageId: **' + messageId +
 					'** el número del campo que deseas editar y el texto que quieras que salga en el canal del evento creado. ' +
 					'[' + tituloEvento + '](https://discord.com/channels/' + guildId + '/' + channelId + '/' + messageId + ')';
@@ -216,6 +218,7 @@ module.exports = {
 					embed.data.title = contenido;
 					break;
 				case '2':
+					contenido = contenido.replaceAll('\\n', '\n');
 					embed.data.description = contenido;
 					break;
 				case '3':
@@ -227,8 +230,8 @@ module.exports = {
 				default:
 					log.error('/evento editar -> CAMPO_ID incorrecto.');
 					
-					embed.data.color = COLOR.RED;
-					embed.data.description = 'CAMPO_ID incorrecto.';
+					embedInfo.color = COLOR.RED;
+					embedInfo.description = 'CAMPO_ID incorrecto.';
 	
 					return await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral});
 			}
