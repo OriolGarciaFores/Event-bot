@@ -79,7 +79,8 @@ module.exports = {
             embed.fields[i] = field;
         }
 
-        embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;
+        embed.footer.text = interaction.user.username;
+		embed.footer.iconURL = interaction.user.displayAvatarURL() + '?id=' + interaction.user.id
 		embed.timestamp = new Date();
 
         await interaction.reply({ embeds: [embed] });
@@ -98,8 +99,7 @@ module.exports = {
 		const OPERATION = '+';
 		var embed = EmbedBuilder.from(reaction.message.embeds[0]);
 		let fields = embed.data.fields;
-		var userId = user.username + '#' + user.discriminator;
-		var creadorEmber = embed.data.footer.text.split(LITERAL.FOOTER_TEXT)[1];
+		var creadorEmber = embed.data.footer.icon_url.split('?id=')[1];
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
 		let totalVotos = 0;
@@ -113,7 +113,9 @@ module.exports = {
 		}
 
 		if (emoji === CONSTANTS.DELETE_REACT) {
-			if (userId === creadorEmber) reaction.message.delete();
+			let member = await reaction.message.guild.members.fetch(user.id);
+			
+			if (user.id === creadorEmber || utils.validateMemberPermissionEdit(member)) reaction.message.delete();
 			else await reaction.message.reactions.resolve(emoji).users.remove(user.id);
 		} else {
 			let position = 0;
@@ -158,7 +160,8 @@ function initEmbed(){
 		fields: [],
 		timestamp: new Date(),
 		footer: {
-			text: 'Creado por XXX'
+			text: 'Creado por XXX',
+			iconURL: ''
 		}
 	};
 

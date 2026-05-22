@@ -71,7 +71,8 @@ module.exports = {
         embed.description = descripcion;
         embed.fields[0].value = horario;
 		if(utils.isImage(urlImage)) embed.image = { url: urlImage};
-        embed.footer.text = LITERAL.FOOTER_TEXT + interaction.user.username + '#' + interaction.user.discriminator;
+        embed.footer.text = interaction.user.username;
+		embed.footer.iconURL = interaction.user.displayAvatarURL() + '?id=' + interaction.user.id
 
         await interaction.reply({embeds: [embed]});
 
@@ -95,14 +96,13 @@ module.exports = {
 	async reactionAdd(reaction, user){
 		let embed = EmbedBuilder.from(reaction.message.embeds[0]);
 		let username = user.username;
-		let userId = username + '#' + user.discriminator;
-		let creadorEmber = embed.data.footer.text.split(LITERAL.FOOTER_TEXT)[1];
+		let creadorEmber = embed.data.footer.icon_url.split('?id=')[1];
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
 		let member = await reaction.message.guild.members.fetch(user.id);
 
 		if (emoji === CONSTANTS.DELETE_REACT) {
-			if (userId === creadorEmber || utils.validateMemberPermissionEdit(member)) {
+			if (user.id === creadorEmber || utils.validateMemberPermissionEdit(member)) {
 				deleteThreadChannel(reaction.message);
 				reaction.message.delete();
 			} else {
@@ -111,7 +111,7 @@ module.exports = {
 		}
 
 		if(emoji === CONSTANTS.EDIT_REACT){
-			if(userId != creadorEmber && !utils.validateMemberPermissionEdit(member) ){
+			if(user.id != creadorEmber && !utils.validateMemberPermissionEdit(member) ){
 				log.debug('Usuario sin permiso de edición.');
 				reaction.message.reactions.resolve(emoji).users.remove(user.id);
 				return;
@@ -198,16 +198,15 @@ module.exports = {
 	},
 	async edit(interaction, message, campoId, contenido){
 		let embed = EmbedBuilder.from(message.embeds[0]);
-		let creadorEmber = embed.data.footer.text.split(LITERAL.FOOTER_TEXT)[1];
+		let creadorEmber = embed.data.footer.icon_url.split('?id=')[1];
 		let user = interaction.user;
-		let userNameNumber = user.username + '#' + user.discriminator;
 		let member = await message.guild.members.fetch(user.id);
 		const embedInfo = {
 			color: COLOR.GREEN,
 			description: 'Mensaje modificado.'
 		}
 
-		if(userNameNumber != creadorEmber && !utils.validateMemberPermissionEdit(member) ){
+		if(user.id != creadorEmber && !utils.validateMemberPermissionEdit(member) ){
 			embedInfo.color = COLOR.RED;
 			embedInfo.description = 'No tienes permisos para editar.';
 			log.debug('Usuario sin permiso de edición.');
@@ -332,7 +331,8 @@ function initEmbed(){
 		],
 		timestamp: new Date(),
 		footer: {
-			text: 'Creado por XXX'
+			text: 'Creado por XXX',
+			iconURL: ''
 		}
 	};
 
