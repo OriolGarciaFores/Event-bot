@@ -1,6 +1,7 @@
 const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = require('discord.js');
 const fs = require('fs');
 const config = require('../config');
+const packageInfo = require('../package.json');
 const log = require('./modules/logger');
 
 const {slashDisabled} = require("./deploySlashCommands.js");
@@ -37,6 +38,7 @@ const embedWelcome = {
 
 const TYPE_REACTION_ADD = 'messageReactionAdd';
 const TYPE_REACTION_REMOVE = 'messageReactionRemove';
+const VERSION = packageInfo.version;
 
 client.slashCommands = new Collection();
 
@@ -63,7 +65,7 @@ init();
 
 client.once("clientReady", () => {
 	log.info("INICIADO");
-	client.user.setActivity(config.status.description + config.status.version, { type: ActivityType.Playing });
+	client.user.setActivity(config.status.description + VERSION, { type: ActivityType.Playing });
 });
 
 client.on('interactionCreate', async interaction => {
