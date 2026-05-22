@@ -39,7 +39,7 @@ LOG_SUCCESS=true
 ```
 Arranque con:
 ```
-npm start
+pnpm start
 ```
 
 ## Docker
