@@ -79,7 +79,7 @@ module.exports = {
 
 		if (permisoCrearHilo) {
 			await msg.startThread({
-				name: titulo,
+				name: titulo - horario,
 				reason: 'Hilo para tratar del evento'
 			});
 		}
