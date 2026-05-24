@@ -170,8 +170,6 @@ module.exports = {
 				break;
 			case CONSTANTS.DELETE_REACT:
 				if (user.id === creadorEmber || utils.validateMemberPermissionEdit(member)) {
-					//deleteThreadChannel(reaction.message);
-					//reaction.message.delete();
 					let embedInfo = {
 						color: COLOR.GREY,
 						description: 'description'
