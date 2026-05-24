@@ -50,6 +50,12 @@ module.exports = {
 				description : "URL para añadir una imagen al evento.",
 				type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
 				required : false
+			},
+			{
+				name: "menciones",
+				description: "Para añadir lista de menciones que notificar (@everyone, @rol, @usuario, etc...).",
+				type: CONSTANTS.SLASH_OPTION_TYPE_STRING,
+				required: false
 			}
         ]
     },
@@ -62,6 +68,7 @@ module.exports = {
         let horario = options.getString('horario');
 		const permisoCrearHilo = utils.getBooleanSiNo(options.getString('crear_hilo'));
 		let urlImage = options.getString('url_img');
+		let menciones = options.getString('menciones');
 
 		descripcion = descripcion.replaceAll('\\n', '\n');
 
@@ -74,7 +81,14 @@ module.exports = {
         embed.footer.text = interaction.user.username;
 		embed.footer.iconURL = interaction.user.displayAvatarURL() + '?id=' + interaction.user.id
 
-        await interaction.reply({embeds: [embed]});
+		if (menciones) {
+			const mencionesList = menciones.split(/ +/);
+
+			mencionesValidas = await obtenerListaMenciones(client, mencionesList, interaction.guildId);
+		}
+
+		if (mencionesValidas != "") await interaction.reply({embeds: [embed], content: mencionesValidas}); 
+        else await interaction.reply({embeds: [embed]});
 
 		const msg = await interaction.fetchReply();
 
@@ -100,61 +114,54 @@ module.exports = {
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
 		let member = await reaction.message.guild.members.fetch(user.id);
-
-		if (emoji === CONSTANTS.DELETE_REACT) {
-			if (user.id === creadorEmber || utils.validateMemberPermissionEdit(member)) {
-				deleteThreadChannel(reaction.message);
-				reaction.message.delete();
-			} else {
-				reaction.message.reactions.resolve(emoji).users.remove(user.id);
-			}
-		}
-
-		if(emoji === CONSTANTS.EDIT_REACT){
-			if(user.id != creadorEmber && !utils.validateMemberPermissionEdit(member) ){
-				log.debug('Usuario sin permiso de edición.');
-				reaction.message.reactions.resolve(emoji).users.remove(user.id);
-				return;
-			}
-		}
+		let fields = embed.data.fields;
+		let position = 0;
 
 		if(oldReactionUser !== undefined && emoji !== CONSTANTS.EDIT_REACT) {
 			await reaction.message.reactions.resolve(emoji).users.remove(user.id);
 			return;
 		}
 
-		if (emoji !== CONSTANTS.DELETE_REACT) {
-			if(emoji !== CONSTANTS.EDIT_REACT){
-				let fields = embed.data.fields;
-				let position = 0;
-	
-				switch (emoji) {
-					case CONSTANTS.DPS:
-						position = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
-						fields[position] = editarField(fields[position], username);
-						break;
-					case CONSTANTS.HEAL:
-						position = getPositionField(fields, LITERAL.FIELD_NAME_HEAL);
-						fields[position] = editarField(fields[position], username);
-						break;
-					case CONSTANTS.TANK:
-						position = getPositionField(fields, LITERAL.FIELD_NAME_TANK);
-						fields[position] = editarField(fields[position], username);
-						break;
-				}
-	
+		switch(emoji) {
+			case CONSTANTS.DPS:
+				position = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
+				fields[position] = editarField(fields[position], username);
 				fields = calcularParticipantes(fields);
+
 				await reaction.message.edit({ embeds: [embed] });
-			}else{
+				break;
+			case CONSTANTS.HEAL:
+				position = getPositionField(fields, LITERAL.FIELD_NAME_HEAL);
+				fields[position] = editarField(fields[position], username);
+				fields = calcularParticipantes(fields);
+
+				await reaction.message.edit({ embeds: [embed] });
+				break;
+			case CONSTANTS.TANK:
+				position = getPositionField(fields, LITERAL.FIELD_NAME_TANK);
+				fields[position] = editarField(fields[position], username);
+				fields = calcularParticipantes(fields);
+
+				await reaction.message.edit({ embeds: [embed] });
+				break;
+			case CONSTANTS.EDIT_REACT:
+				if(user.id != creadorEmber && !utils.validateMemberPermissionEdit(member)) {
+					log.debug('Usuario sin permiso de edición.');
+					reaction.message.reactions.resolve(emoji).users.remove(user.id);
+					return;
+				}
+
 				let embedInfo = {
 					color: COLOR.GREY,
 					description: 'description'
 				}
+
 				let embedEditable = {
 					color: COLOR.GREY,
 					title: 'Escoge el número del campo que quieras modificar',
 					fields: []
 				}
+
 				const channelId = reaction.message.channelId;
 				const guildId = reaction.message.guildId;
 				const messageId = reaction.message.id;
@@ -174,7 +181,34 @@ module.exports = {
 
 				user.send({ embeds: [embedEditable, embedInfo] });
 				reaction.message.reactions.resolve(emoji).users.remove(user.id);
-			}
+				break;
+			case CONSTANTS.DELETE_REACT:
+				if (user.id === creadorEmber || utils.validateMemberPermissionEdit(member)) {
+					let embedInfo = {
+						color: COLOR.GREY,
+						description: 'description'
+					}
+
+					const channelId = reaction.message.channelId;
+					const guildId = reaction.message.guildId;
+					const messageId = reaction.message.id;
+					const tituloEvento = embed.data.title;
+					const image_url = embed.data.image?.url || '\u200B';
+
+					embed.data.description = embed.data.description.replaceAll('\n', '\\n');
+
+					embedInfo.description = 'Si quieres eliminar el evento ' + tituloEvento + ' usa **/remove evento** e informar en el campo event_id: **' + messageId +
+						'** en el canal del siguiente enlace: [' + tituloEvento + '](https://discord.com/channels/' + guildId + '/' + channelId + '/' + messageId + ')';
+
+					user.send({ embeds: [embedInfo] });
+					reaction.message.reactions.resolve(emoji).users.remove(user.id);
+				} else {
+					reaction.message.reactions.resolve(emoji).users.remove(user.id);
+				}
+				break;
+			default:
+				log.warn('/evento Emoji incorrecto');
+				return;
 		}
 	},
 	async reactionRemove(reaction, user){
@@ -191,6 +225,8 @@ module.exports = {
 			case CONSTANTS.TANK:
 				fields = retirarUserField(fields, user.username, LITERAL.FIELD_NAME_TANK);
 				break;
+			default:
+				return;
 		}
 
 		fields = calcularParticipantes(fields);
@@ -309,6 +345,30 @@ module.exports = {
 
 		await message.edit({ embeds: [embed] });
 		await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral});
+	},
+	async remove(interaction, message) {
+		let embed = EmbedBuilder.from(message.embeds[0]);
+		let creadorEmber = embed.data.footer.icon_url.split('?id=')[1];
+		let user = interaction.user;
+		let member = await message.guild.members.fetch(user.id);
+
+		if(user.id != creadorEmber && !utils.validateMemberPermissionEdit(member)) {
+			embedInfo.color = COLOR.RED;
+			embedInfo.description = 'No tienes permisos para eliminar.';
+			log.debug('Usuario sin permiso de edición.');
+			await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral });
+			return;
+		}
+
+		deleteThreadChannel(message);
+		message.delete();
+
+		const embedInfo = {
+			color: COLOR.GREEN,
+			description: 'El evento ha sido eliminado correctamente.'
+		}
+
+		await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral });
 	}
 };
 
@@ -467,4 +527,33 @@ async function editNameThread(message, data) {
 			console.error(error);
 		}
 	}
+}
+
+async function obtenerListaMenciones(client, mencionesList, guildId) {
+	let mencionesValidas = "";
+
+	for (let i = 0; i < mencionesList.length; i++) {
+		if (mencionesList[i].includes('@')) {
+			if (mencionesList[i] === '@everyone') {
+				mencionesValidas = mencionesValidas === "" ? mencionesList[i] : mencionesValidas + " " + mencionesList[i];
+			} else {
+				let mencionId = mencionesList[i].replace(/[^0-9 ]/g, "").trim();
+
+				if (mencionId === "") continue;
+
+				let rol = await utils.findRol(client, guildId, mencionId);
+				let member = await client.users.fetch(mencionId).catch(err => log.debug('No se encuentra el usuario ' + mencionId));
+
+				if (rol) {
+					mencionesValidas = mencionesValidas === "" ? mencionesList[i] : mencionesValidas + " " + mencionesList[i];
+				}
+
+				if (member) {
+					mencionesValidas = mencionesValidas === "" ? mencionesList[i] : mencionesValidas + " " + mencionesList[i];
+				}
+			}
+		}
+	}
+
+	return mencionesValidas;
 }

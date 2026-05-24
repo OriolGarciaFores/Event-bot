@@ -3,6 +3,7 @@ const fs = require('fs');
 const config = require('../config');
 const packageInfo = require('../package.json');
 const log = require('./modules/logger');
+const queueManager = require('./modules/queueManager.js');
 
 const {slashDisabled} = require("./deploySlashCommands.js");
 require("dotenv").config();
@@ -166,8 +167,8 @@ async function reactions(type, message, reaction, user) {
 
 		if (!command || !command.reactions) return;
 
-		if (type === TYPE_REACTION_ADD) await command.reactionAdd(reaction, user);
-		if (type === TYPE_REACTION_REMOVE) await command.reactionRemove(reaction, user);
+		if (type === TYPE_REACTION_ADD) queueManager.addToQueue({type: 'REACTION_ADD', command, reaction, user});
+		if (type === TYPE_REACTION_REMOVE) queueManager.addToQueue({type: 'REACTION_REMOVE', command, reaction, user});
 	} catch (e) {
 		log.error(e);
 	}
