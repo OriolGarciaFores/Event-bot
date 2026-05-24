@@ -8,5 +8,6 @@ module.exports = {
     FIELD_PARTICIPANTES_TOTAL : '**Total:** ',
     FOOTER_TEXT : 'Creado por ',
     TITLE_HORARIO : 'HORARIO',
-    ERROR_ADD_USER_EVENT : 'Error, no es posible añadir el usuario en este tipo de evento.'
+    ERROR_ADD_USER_EVENT : 'Error, no es posible añadir el usuario en este tipo de evento.',
+    ERROR_REMOVE : 'Error, no es posible ejecutar el comando /remove. No se encuentra el elemento que se desea eliminar.'
 }

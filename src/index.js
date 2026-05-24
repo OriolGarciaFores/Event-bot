@@ -1,7 +1,9 @@
 const { Client, Collection, GatewayIntentBits, ActivityType, Partials } = require('discord.js');
 const fs = require('fs');
 const config = require('../config');
+const packageInfo = require('../package.json');
 const log = require('./modules/logger');
+const queueManager = require('./modules/queueManager.js');
 const guildService = require('./services/guildService');
 
 const {slashDisabled} = require("./deploySlashCommands.js");
@@ -38,6 +40,7 @@ const embedWelcome = {
 
 const TYPE_REACTION_ADD = 'messageReactionAdd';
 const TYPE_REACTION_REMOVE = 'messageReactionRemove';
+const VERSION = packageInfo.version;
 
 client.slashCommands = new Collection();
 
@@ -64,7 +67,7 @@ init();
 
 client.once("clientReady", () => {
 	log.info("INICIADO");
-	client.user.setActivity(config.status.description + config.status.version, { type: ActivityType.Playing });
+	client.user.setActivity(config.status.description + VERSION, { type: ActivityType.Playing });
 	guildService.initializeGuilds(client.guilds.cache.map(g => ({ id: g.id, name: g.name })));
 });
 
@@ -166,8 +169,8 @@ async function reactions(type, message, reaction, user) {
 
 		if (!command || !command.reactions) return;
 
-		if (type === TYPE_REACTION_ADD) await command.reactionAdd(reaction, user);
-		if (type === TYPE_REACTION_REMOVE) await command.reactionRemove(reaction, user);
+		if (type === TYPE_REACTION_ADD) queueManager.addToQueue({type: 'REACTION_ADD', command, reaction, user});
+		if (type === TYPE_REACTION_REMOVE) queueManager.addToQueue({type: 'REACTION_REMOVE', command, reaction, user});
 	} catch (e) {
 		log.error(e);
 	}
