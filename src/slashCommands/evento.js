@@ -100,61 +100,54 @@ module.exports = {
 		let oldReactionUser = await utils.getOldReactionByUser(reaction, user);
 		let emoji = reaction.emoji.name;
 		let member = await reaction.message.guild.members.fetch(user.id);
-
-		if (emoji === CONSTANTS.DELETE_REACT) {
-			if (user.id === creadorEmber || utils.validateMemberPermissionEdit(member)) {
-				deleteThreadChannel(reaction.message);
-				reaction.message.delete();
-			} else {
-				reaction.message.reactions.resolve(emoji).users.remove(user.id);
-			}
-		}
-
-		if(emoji === CONSTANTS.EDIT_REACT){
-			if(user.id != creadorEmber && !utils.validateMemberPermissionEdit(member) ){
-				log.debug('Usuario sin permiso de edición.');
-				reaction.message.reactions.resolve(emoji).users.remove(user.id);
-				return;
-			}
-		}
+		let fields = embed.data.fields;
+		let position = 0;
 
 		if(oldReactionUser !== undefined && emoji !== CONSTANTS.EDIT_REACT) {
 			await reaction.message.reactions.resolve(emoji).users.remove(user.id);
 			return;
 		}
 
-		if (emoji !== CONSTANTS.DELETE_REACT) {
-			if(emoji !== CONSTANTS.EDIT_REACT){
-				let fields = embed.data.fields;
-				let position = 0;
-	
-				switch (emoji) {
-					case CONSTANTS.DPS:
-						position = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
-						fields[position] = editarField(fields[position], username);
-						break;
-					case CONSTANTS.HEAL:
-						position = getPositionField(fields, LITERAL.FIELD_NAME_HEAL);
-						fields[position] = editarField(fields[position], username);
-						break;
-					case CONSTANTS.TANK:
-						position = getPositionField(fields, LITERAL.FIELD_NAME_TANK);
-						fields[position] = editarField(fields[position], username);
-						break;
-				}
-	
+		switch(emoji) {
+			case CONSTANTS.DPS:
+				position = getPositionField(fields, LITERAL.FIELD_NAME_DPS);
+				fields[position] = editarField(fields[position], username);
 				fields = calcularParticipantes(fields);
+
 				await reaction.message.edit({ embeds: [embed] });
-			}else{
+				break;
+			case CONSTANTS.HEAL:
+				position = getPositionField(fields, LITERAL.FIELD_NAME_HEAL);
+				fields[position] = editarField(fields[position], username);
+				fields = calcularParticipantes(fields);
+
+				await reaction.message.edit({ embeds: [embed] });
+				break;
+			case CONSTANTS.TANK:
+				position = getPositionField(fields, LITERAL.FIELD_NAME_TANK);
+				fields[position] = editarField(fields[position], username);
+				fields = calcularParticipantes(fields);
+
+				await reaction.message.edit({ embeds: [embed] });
+				break;
+			case CONSTANTS.EDIT_REACT:
+				if(user.id != creadorEmber && !utils.validateMemberPermissionEdit(member)) {
+					log.debug('Usuario sin permiso de edición.');
+					reaction.message.reactions.resolve(emoji).users.remove(user.id);
+					return;
+				}
+
 				let embedInfo = {
 					color: COLOR.GREY,
 					description: 'description'
 				}
+
 				let embedEditable = {
 					color: COLOR.GREY,
 					title: 'Escoge el número del campo que quieras modificar',
 					fields: []
 				}
+
 				const channelId = reaction.message.channelId;
 				const guildId = reaction.message.guildId;
 				const messageId = reaction.message.id;
@@ -174,7 +167,18 @@ module.exports = {
 
 				user.send({ embeds: [embedEditable, embedInfo] });
 				reaction.message.reactions.resolve(emoji).users.remove(user.id);
-			}
+				break;
+			case CONSTANTS.DELETE_REACT:
+				if (user.id === creadorEmber || utils.validateMemberPermissionEdit(member)) {
+					deleteThreadChannel(reaction.message);
+					reaction.message.delete();
+				} else {
+					reaction.message.reactions.resolve(emoji).users.remove(user.id);
+				}
+				break;
+			default:
+				log.warn('/evento Emoji incorrecto');
+				return;
 		}
 	},
 	async reactionRemove(reaction, user){
@@ -191,6 +195,8 @@ module.exports = {
 			case CONSTANTS.TANK:
 				fields = retirarUserField(fields, user.username, LITERAL.FIELD_NAME_TANK);
 				break;
+			default:
+				return;
 		}
 
 		fields = calcularParticipantes(fields);
