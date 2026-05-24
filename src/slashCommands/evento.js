@@ -170,8 +170,26 @@ module.exports = {
 				break;
 			case CONSTANTS.DELETE_REACT:
 				if (user.id === creadorEmber || utils.validateMemberPermissionEdit(member)) {
-					deleteThreadChannel(reaction.message);
-					reaction.message.delete();
+					//deleteThreadChannel(reaction.message);
+					//reaction.message.delete();
+					let embedInfo = {
+						color: COLOR.GREY,
+						description: 'description'
+					}
+
+					const channelId = reaction.message.channelId;
+					const guildId = reaction.message.guildId;
+					const messageId = reaction.message.id;
+					const tituloEvento = embed.data.title;
+					const image_url = embed.data.image?.url || '\u200B';
+
+					embed.data.description = embed.data.description.replaceAll('\n', '\\n');
+
+					embedInfo.description = 'Si quieres eliminar el evento ' + tituloEvento + ' usa **/remove evento** con el campo messageId: **' + messageId +
+						'** en el canal del siguiente enlace: [' + tituloEvento + '](https://discord.com/channels/' + guildId + '/' + channelId + '/' + messageId + ')';
+
+					user.send({ embeds: [embedInfo] });
+					reaction.message.reactions.resolve(emoji).users.remove(user.id);
 				} else {
 					reaction.message.reactions.resolve(emoji).users.remove(user.id);
 				}
@@ -315,6 +333,30 @@ module.exports = {
 
 		await message.edit({ embeds: [embed] });
 		await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral});
+	},
+	async remove(interaction, message) {
+		let embed = EmbedBuilder.from(message.embeds[0]);
+		let creadorEmber = embed.data.footer.icon_url.split('?id=')[1];
+		let user = interaction.user;
+		let member = await message.guild.members.fetch(user.id);
+
+		if(user.id != creadorEmber && !utils.validateMemberPermissionEdit(member)) {
+			embedInfo.color = COLOR.RED;
+			embedInfo.description = 'No tienes permisos para eliminar.';
+			log.debug('Usuario sin permiso de edición.');
+			await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral });
+			return;
+		}
+
+		deleteThreadChannel(message);
+		message.delete();
+
+		const embedInfo = {
+			color: COLOR.GREEN,
+			description: 'El evento ha sido eliminado correctamente.'
+		}
+
+		await interaction.reply({embeds: [embedInfo], flags: MessageFlags.Ephemeral });
 	}
 };
 
