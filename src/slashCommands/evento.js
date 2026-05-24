@@ -50,6 +50,12 @@ module.exports = {
 				description : "URL para añadir una imagen al evento.",
 				type : CONSTANTS.SLASH_OPTION_TYPE_STRING,
 				required : false
+			},
+			{
+				name: "menciones",
+				description: "Para añadir lista de menciones que notificar (@everyone, @rol, @usuario, etc...).",
+				type: CONSTANTS.SLASH_OPTION_TYPE_STRING,
+				required: false
 			}
         ]
     },
@@ -62,6 +68,7 @@ module.exports = {
         let horario = options.getString('horario');
 		const permisoCrearHilo = utils.getBooleanSiNo(options.getString('crear_hilo'));
 		let urlImage = options.getString('url_img');
+		let menciones = options.getString('menciones');
 
 		descripcion = descripcion.replaceAll('\\n', '\n');
 
@@ -74,7 +81,14 @@ module.exports = {
         embed.footer.text = interaction.user.username;
 		embed.footer.iconURL = interaction.user.displayAvatarURL() + '?id=' + interaction.user.id
 
-        await interaction.reply({embeds: [embed]});
+		if (menciones) {
+			const mencionesList = menciones.split(/ +/);
+
+			mencionesValidas = await obtenerListaMenciones(client, mencionesList, interaction.guildId);
+		}
+
+		if (mencionesValidas != "") await interaction.reply({embeds: [embed], content: mencionesValidas}); 
+        else await interaction.reply({embeds: [embed]});
 
 		const msg = await interaction.fetchReply();
 
@@ -513,4 +527,33 @@ async function editNameThread(message, data) {
 			console.error(error);
 		}
 	}
+}
+
+async function obtenerListaMenciones(client, mencionesList, guildId) {
+	let mencionesValidas = "";
+
+	for (let i = 0; i < mencionesList.length; i++) {
+		if (mencionesList[i].includes('@')) {
+			if (mencionesList[i] === '@everyone') {
+				mencionesValidas = mencionesValidas === "" ? mencionesList[i] : mencionesValidas + " " + mencionesList[i];
+			} else {
+				let mencionId = mencionesList[i].replace(/[^0-9 ]/g, "").trim();
+
+				if (mencionId === "") continue;
+
+				let rol = await utils.findRol(client, guildId, mencionId);
+				let member = await client.users.fetch(mencionId).catch(err => log.debug('No se encuentra el usuario ' + mencionId));
+
+				if (rol) {
+					mencionesValidas = mencionesValidas === "" ? mencionesList[i] : mencionesValidas + " " + mencionesList[i];
+				}
+
+				if (member) {
+					mencionesValidas = mencionesValidas === "" ? mencionesList[i] : mencionesValidas + " " + mencionesList[i];
+				}
+			}
+		}
+	}
+
+	return mencionesValidas;
 }
