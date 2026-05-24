@@ -197,7 +197,7 @@ module.exports = {
 
 					embed.data.description = embed.data.description.replaceAll('\n', '\\n');
 
-					embedInfo.description = 'Si quieres eliminar el evento ' + tituloEvento + ' usa **/remove evento** con el campo messageId: **' + messageId +
+					embedInfo.description = 'Si quieres eliminar el evento ' + tituloEvento + ' usa **/remove evento** e informar en el campo event_id: **' + messageId +
 						'** en el canal del siguiente enlace: [' + tituloEvento + '](https://discord.com/channels/' + guildId + '/' + channelId + '/' + messageId + ')';
 
 					user.send({ embeds: [embedInfo] });
