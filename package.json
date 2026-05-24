@@ -1,6 +1,6 @@
 {
   "name": "event-bot",
-  "version": "1.6.5-snapshot",
+  "version": "1.7.0-snapshot",
   "description": "",
   "main": "src/index.js",
   "scripts": {
