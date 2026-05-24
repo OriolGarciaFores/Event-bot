@@ -1,6 +1,6 @@
 const CONSTANTS = require('../constants/constants.js');
 const COLOR = require('../constants/colors.js');
-const { Permissions } = require('discord.js');
+const { PermissionsBitField } = require('discord.js');
 
 function progressBar (value, maxValue, size) {
     if(maxValue <= 0) maxValue = 1;
@@ -50,7 +50,7 @@ function progressBar (value, maxValue, size) {
   }
 
   function isImage(url){
-    return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
+    return /\.(jpg|jpeg|png|webp|avif|gif|svg)(\?.*)?$/i.test(url);
   }
 
   function isUrl(url){
@@ -58,7 +58,7 @@ function progressBar (value, maxValue, size) {
   }
 
   function validateMemberPermissionEdit(member){
-    return member.permissions.has(['MANAGE_MESSAGES']);
+    return member.permissions.has(PermissionsBitField.Flags.ManageMessages);
   }
 
   async function findRol(client, guildId, rolId){

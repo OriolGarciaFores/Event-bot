@@ -61,7 +61,7 @@ module.exports = {
             embed.title = titulo;
             embed.description = descripcion;
             embed.author.name = interaction.user.username;
-            embed.author.icon_url = interaction.user.displayAvatarURL();
+            embed.author.icon_url = interaction.user.displayAvatarURL() + '?id=' + interaction.user.id;
 
             if(menciones){
                 const mencionesList = menciones.split(/ +/);
@@ -78,12 +78,11 @@ module.exports = {
 	},
 	async reactionAdd(reaction, user){
         let embed = EmbedBuilder.from(reaction.message.embeds[0]);
-		let userId = user.username;
-		let creadorEmber = embed.data.author.name;
+		let creadorEmber = embed.data.author.icon_url.split('?id=')[1];
         let emoji = reaction.emoji.name;
 
         if (emoji === constant.DELETE_REACT){
-			if(userId === creadorEmber) reaction.message.delete();
+			if(user.id === creadorEmber) reaction.message.delete();
 			else reaction.message.reactions.resolve(emoji).users.remove(user.id);
 		}
 	},
