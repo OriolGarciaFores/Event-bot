@@ -32,7 +32,11 @@ function correct(content){
 function debug(content){
     if(config.logs.debugEnable) {
         let fecha = new Date();
-        console.log('[DEBUG][' + fecha.toLocaleString() + '] ' + content);
+        if (typeof content === 'object') {
+            console.log('[DEBUG][' + fecha.toLocaleString() + '] ', content);
+        } else {
+            console.log('[DEBUG][' + fecha.toLocaleString() + '] ' + content);
+        }
     }
 }
 
