@@ -69,6 +69,7 @@ module.exports = {
 		const permisoCrearHilo = utils.getBooleanSiNo(options.getString('crear_hilo'));
 		let urlImage = options.getString('url_img');
 		let menciones = options.getString('menciones');
+		let mencionesValidas = "";
 
 		descripcion = descripcion.replaceAll('\\n', '\n');
 
