@@ -20,8 +20,8 @@ function createApi(client) {
             description: ''
         };
 
-        const { title, message, userId } = req.body;
-        const user = await client.users.fetch(userId);
+        const { title, message, ownerDiscordId } = req.body;
+        const user = await client.users.fetch(ownerDiscordId);
 
         embedReport.title = title;
         embedReport.description = message;
