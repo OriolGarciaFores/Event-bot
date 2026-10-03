@@ -1,0 +1,12 @@
+
+### Test servicio spring boot obtener todos reminders
+GET http://localhost:8080/api/reminders
+
+### Test api discordbot
+POST http://localhost:1234/discordbot-alts
+Content-Type: application/json
+
+{
+    "title": "prueba",
+    "message": "Es la hora"
+}

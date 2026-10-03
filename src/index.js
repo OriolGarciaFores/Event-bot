@@ -6,6 +6,7 @@ const log = require('./modules/logger');
 const queueManager = require('./modules/queueManager.js');
 
 const {slashDisabled} = require("./deploySlashCommands.js");
+const { startApi } = require("./api/server.js");
 require("dotenv").config();
 
 const client = new Client({
@@ -60,6 +61,8 @@ const init = async () => {
 	}
 
 	client.login(config.token);
+
+	startApi(client);
 }
 
 init();
