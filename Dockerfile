@@ -8,7 +8,7 @@ RUN npm install -g pnpm
 WORKDIR /app-altsBot
 
 # Copiar package.json y package-lock.json primero
-COPY package.json pnpm-lock-yaml* ./
+COPY package.json pnpm-lock.yaml* ./
 
 # Instalar dependencias
 RUN pnpm install --frozen-lockfile
