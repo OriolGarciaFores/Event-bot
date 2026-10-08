@@ -1,8 +1,8 @@
 # Imagen base Node 24 ligera
 FROM node:24-alpine
 
-# Instalar pnpm globalmente en el contenedor
-RUN npm install -g pnpm
+# Habilitar corepack para usar pnpm nativo de Node
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 # Directorio del contenedor del app
 WORKDIR /app-altsBot
