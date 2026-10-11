@@ -1,0 +1,18 @@
+name: alts-bot
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: alts-bot
+    container_name: alts-bot
+    restart: no
+    env_file:
+      - .env                  # Lee automáticamente el archivo .env local
+    networks:
+      - tebra-network-pro
+
+networks:
+  tebra-network:
+    external: true            # Red compartida externa entre contenedores creada previamente
