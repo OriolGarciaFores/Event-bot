@@ -14,5 +14,5 @@ services:
       - tebra-network-pro
 
 networks:
-  tebra-network:
+  tebra-network-pro:
     external: true            # Red compartida externa entre contenedores creada previamente
