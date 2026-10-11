@@ -1,6 +1,6 @@
 {
   "name": "event-bot",
-  "version": "1.8.0-snpashot",
+  "version": "1.9.0-snpashot",
   "description": "",
   "main": "src/index.js",
   "scripts": {
